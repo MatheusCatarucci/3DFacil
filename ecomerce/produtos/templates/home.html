@@ -8,42 +8,68 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <title>Produtos</title>
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <title>Produtos | 3DFácil</title>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-[#f8f7fa] min-h-screen flex flex-col">
+
 
     <!-- =====================================================
          HEADER
     ====================================================== -->
 
-    <header class="bg-white shadow-sm">
+    <header class="bg-white border-b border-zinc-200 sticky top-0 z-50">
 
-        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
-            <a href="/" class="text-xl font-bold text-gray-800">
+            <!-- LOGO -->
+
+            <a href="/" class="text-xl font-bold tracking-tight" style="color: var(--default-color);">
+
                 3DFácil
+
             </a>
 
-            <nav class="flex items-center gap-6 text-sm text-gray-600">
 
-                <a href="/" class="hover:text-gray-900">
+            <!-- NAVEGAÇÃO -->
+
+            <nav class="flex items-center gap-6 text-sm text-zinc-600">
+
+                <a href="/" class="hover:text-zinc-950 transition-colors">
+
                     Início
+
                 </a>
 
-                <a href="#produtos" class="hover:text-gray-900">
+
+                <a href="#produtos" class="hover:text-zinc-950 transition-colors">
+
                     Produtos
+
                 </a>
+
 
                 <a href="https://wa.me/5519998742782?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%203DF%C3%A1cil"
-                    class="hover:text-gray-900">
+                    class="hover:text-zinc-950 transition-colors" target="_blank">
+
                     Contato
+
                 </a>
 
-                <a href="#" class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+
+                <a href="#"
+                    class="text-white px-4 py-2.5 rounded-lg font-medium transition-all hover:opacity-90 hover:shadow-md"
+                    style="background-color: var(--default-color);">
+
                     Carrinho
+
                 </a>
 
             </nav>
@@ -53,21 +79,50 @@
     </header>
 
 
+
     <!-- =====================================================
          CONTEÚDO PRINCIPAL
     ====================================================== -->
 
     <main class="flex-1">
 
-        <section class="max-w-5xl mx-auto px-4 py-10">
+        <section class="max-w-6xl mx-auto px-4 py-12">
 
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
-                Produtos
-            </h1>
 
-            <p class="text-gray-500 mb-8">
-                Confira nossos produtos disponíveis.
-            </p>
+            <!-- TÍTULO -->
+
+            <div class="mb-10 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-medium mb-2" style="color: var(--default-color);">
+
+                        Nossa loja
+
+                    </p>
+
+
+                    <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 tracking-tight">
+
+                        Produtos
+
+                    </h1>
+
+
+                    <p class="text-zinc-500 mt-2 max-w-xl">
+
+                        Confira nossos produtos impressos em 3D e encontre
+                        o item ideal para você.
+
+                    </p>
+                </div>
+
+                <div class="buscar w-100 p-2 border-2 bg-[#f9f9f9] rounded-xl outline-none text-[14px] flex gap-2">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="w-full outline-none"
+                        placeholder="Buscar...">
+                </div>
+
+            </div>
+
 
 
             <!-- =================================================
@@ -76,72 +131,169 @@
 
             <div id="produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
+
                 {% for produto in produtos %}
 
-                <!-- CARD DO PRODUTO -->
 
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col aspect-square">
+                <!-- =================================================
+                     CARD DO PRODUTO
+                ================================================== -->
 
-                    <!-- IMAGEM DO PRODUTO -->
+                <div
+                    class="group bg-white rounded-2xl overflow-hidden border border-zinc-200 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
-                    {% if produto.imagem %}
 
-                    <!--
-                            Se o produto tiver uma imagem cadastrada
-                            no banco de dados, usa essa imagem.
+                    <!-- =================================================
+                         IMAGEM
+                    ================================================== -->
+
+                    <div class="relative h-64 bg-zinc-50 flex items-center justify-center overflow-hidden">
+
+
+                        {% if produto.imagem %}
+
+
+                        <!--
+                            Produto possui imagem cadastrada.
                         -->
 
-                    <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="h-40 w-full object-cover">
+                        <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
 
-                    {% else %}
 
-                    <!--
-                            Se não tiver imagem cadastrada,
-                            usa a imagem padrão.
+                        {% else %}
+
+
+                        <!--
+                            Produto não possui imagem.
+                            Utiliza imagem padrão.
                         -->
 
-                    <img src="{% static 'img/bulldog_cube.png' %}" alt="{{ produto.nome }}"
-                        class="h-40 w-full object-contain">
-
-                    {% endif %}
+                        <img src="{% static 'img/bulldog_cube.png' %}" alt="{{ produto.nome }}">
 
 
-                    <!-- INFORMAÇÕES DO PRODUTO -->
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         INFORMAÇÕES DO PRODUTO
+                    ================================================== -->
 
                     <div class="p-5 flex flex-col flex-1">
 
-                        <h2 class="font-semibold text-gray-800">
+
+                        <!-- NOME -->
+
+                        <h2 class="text-lg font-semibold text-zinc-900 line-clamp-2">
+
                             {{ produto.nome }}
+
                         </h2>
 
-                        <p class="text-sm text-gray-500 mt-1">
-                            A partir de
+
+
+                        <!-- DESCRIÇÃO -->
+
+                        <p class="text-sm text-zinc-500 mt-2">
+
+                            Impressão 3D de alta qualidade.
+
                         </p>
 
-                        <p class="text-xl font-bold text-green-600 mb-4">
-                            R$ {{ produto.preco|floatformat:2 }}
-                        </p>
 
 
-                        <a href="#"
-                            class="mt-auto text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
+                        <!-- =================================================
+                             PREÇO
+                        ================================================== -->
+
+                        <div class="mt-5">
+
+                            <span class="text-xs text-zinc-500">
+
+                                A partir de
+
+                            </span>
+
+
+                            <p class="text-2xl font-bold mt-0.5" style="color: var(--default-color);">
+
+                                R$ {{ produto.preco|floatformat:2 }}
+
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             BOTÃO
+                        ================================================== -->
+
+                        <a href="https://wa.me/5519998742782?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%203DF%C3%A1cil"
+                            class="mt-5 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-medium transition-all duration-200 hover:opacity-90 hover:shadow-md"
+                            style="background-color: var(--default-color);" target="_blank">
+
                             Comprar
+
+                            <span class="text-lg">
+
+                                →
+
+                            </span>
+
                         </a>
 
+
                     </div>
+
 
                 </div>
 
 
                 {% empty %}
 
-                <!-- CASO NÃO TENHA PRODUTOS -->
 
-                <p class="col-span-full bg-white rounded-lg shadow-sm px-5 py-8 text-center text-gray-500">
-                    Nenhum produto cadastrado
-                </p>
+                <!-- =================================================
+                     NENHUM PRODUTO
+                ================================================== -->
+
+                <div class="col-span-full bg-white rounded-2xl border border-zinc-200 px-6 py-12 text-center">
+
+
+                    <div class="w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center"
+                        style="background-color: var(--default-color-light);">
+
+                        <span class="text-xl" style="color: var(--default-color);">
+
+                            !
+
+                        </span>
+
+                    </div>
+
+
+                    <h2 class="font-semibold text-zinc-900">
+
+                        Nenhum produto cadastrado
+
+                    </h2>
+
+
+                    <p class="text-sm text-zinc-500 mt-1">
+
+                        No momento não existem produtos disponíveis.
+
+                    </p>
+
+
+                </div>
+
 
                 {% endfor %}
+
 
             </div>
 
@@ -150,92 +302,95 @@
     </main>
 
 
+
     <!-- =====================================================
          FOOTER
     ====================================================== -->
 
-    <footer id="contato" class="bg-gray-800 text-gray-300">
+    <footer id="contato" class="bg-zinc-950 text-zinc-400">
 
-        <div class="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+
+        <div class="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 gap-8">
+
 
             <!-- SOBRE -->
 
-            <div>
+            <div class="flex items-center justify-center flex-col text-center">
 
-                <h3 class="font-semibold text-white mb-2">
+                <h3 class="font-semibold text-white mb-3">
+
                     3DFácil
+
                 </h3>
 
-                <p>
-                    Qualidade e bom preço desde sempre.
+
+                <p class="text-sm leading-relaxed max-w-xs">
+
+                    Produtos impressos em 3D com qualidade,
+                    praticidade e preço justo.
+
                 </p>
 
             </div>
-
-
-            <!-- LINKS -->
-
-            <div>
-
-                <h3 class="font-semibold text-white mb-2">
-                    Links
-                </h3>
-
-                <ul class="space-y-1">
-
-                    <li>
-                        <a href="/" class="hover:text-white">
-                            Início
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#produtos" class="hover:text-white">
-                            Produtos
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="hover:text-white">
-                            Carrinho
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-
 
             <!-- CONTATO -->
 
-            <div>
+            <div class="flex items-center justify-center flex-col text-center">
 
-                <h3 class="font-semibold text-white mb-2">
-                    Contato
+                <h3 class="font-semibold text-white mb-3">
+
+                    Contato - Telefone e Whatsapp
+
                 </h3>
 
-                <p>
-                    contato@minhaloja.com.br
-                </p>
 
-                <p>
-                    (19) 0000-0000
-                </p>
+                <div class="space-y-2 text-sm">
+
+                    <p>
+
+                        matheus.catarucci7@gmail.com
+
+                    </p>
+
+
+                    <p>
+
+                        (19) 99874-2782
+
+                    </p>
+
+
+                    <a href="https://wa.me/5519998742782?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%203DF%C3%A1cil"
+                        class="inline-block mt-2 hover:text-white transition-colors" target="_blank">
+
+                        Falar pelo WhatsApp <i class="bi bi-whatsapp text-green-500"></i>
+
+                    </a>
+
+                </div>
 
             </div>
 
+
         </div>
+
 
 
         <!-- COPYRIGHT -->
 
-        <div class="border-t border-gray-700 text-center text-xs py-4">
+        <div class="border-t border-zinc-800">
 
-            &copy; 2026 3DFácil. Todos os direitos reservados.
+            <div class="max-w-6xl mx-auto px-4 py-5 text-center text-xs text-zinc-500">
+
+                &copy; 2026 3DFácil. Todos os direitos reservados.
+
+            </div>
 
         </div>
 
+
     </footer>
+
 
 </body>
 
