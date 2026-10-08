@@ -8,7 +8,6 @@ btn_buscar.addEventListener('click', () => {
 
     for (let i = 0; i < nomes_produtos.length; i++) {
         const nome_produto = nomes_produtos[i].textContent.toLowerCase().trim()
-        console.log(nome_produto)
         if ((nome_produto.includes(input_value))) {
             cards_produtos[i].style.display = 'flex'
         }

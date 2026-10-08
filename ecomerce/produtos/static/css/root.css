@@ -1,4 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap');
+
+/* ============================================================
+   FONTES
+   ============================================================ */
+
+/*
+    Chakra Petch — robotic/futurista, só no título da header.
+    Tem pesos reais de 300 a 700, então font-bold / font-medium
+    do Tailwind funcionam de verdade (sem falso negrito).
+
+    Só pedimos 400 e 700 no @import acima para não baixar
+    arquivo de fonte que ninguém usa.
+*/
+.font-titulo {
+    font-family: 'Chakra Petch', sans-serif;
+}
 
 :root {
     font-family: 'Montserrat', sans-serif;

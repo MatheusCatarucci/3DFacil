@@ -8,6 +8,9 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- FAVICON -->
+    <link rel="icon" href="{% static 'img/Logo_3DFácil.png' %}" type="image/png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
@@ -30,12 +33,16 @@
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
             <!-- LOGO -->
+            <div class="flex items-center gap-3">
+                <img src="{% static 'img/Logo_3DFácil.png' %}" alt="3DFácil" width="40" height="40"
+                    class="h-10 w-10 object-contain shrink-0">
 
-            <a href="/" class="text-xl font-bold tracking-tight" style="color: var(--default-color);">
+                <a href="/" class="font-titulo text-2xl font-bold tracking-tight" style="color: var(--default-color);">
 
-                3DFácil
+                    3DFácil
 
-            </a>
+                </a>
+            </div>
 
 
             <!-- NAVEGAÇÃO -->
