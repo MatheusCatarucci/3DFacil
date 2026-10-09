@@ -2,8 +2,10 @@ const input_buscar = document.getElementById('buscar_input')
 const btn_buscar = document.getElementById('buscar_btn')
 const cards_produtos = document.querySelectorAll('.card_produto')
 const nomes_produtos = document.querySelectorAll('.nome_produto')
+const form_buscar = document.getElementById('buscar_form')
 
-btn_buscar.addEventListener('click', () => {
+form_buscar.addEventListener('submit', (event) => {
+    event.preventDefault()
     const input_value = input_buscar.value.toLowerCase().trim()
 
     for (let i = 0; i < nomes_produtos.length; i++) {
@@ -15,7 +17,4 @@ btn_buscar.addEventListener('click', () => {
             cards_produtos[i].style.display = 'none'
         }
     }
-
-
-
 })
