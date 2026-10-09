@@ -133,7 +133,12 @@ USE_TZ = True
 # ============================================================
 
 # URL usada pelo navegador para acessar arquivos estáticos
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# Pastas de arquivos estáticos localizadas na raiz do projeto
+STATICFILES_DIRS = [
+    BASE_DIR / 'assets',
+]
 
 
 # ============================================================

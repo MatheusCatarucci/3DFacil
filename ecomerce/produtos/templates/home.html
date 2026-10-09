@@ -8,6 +8,9 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- FAVICON -->
+    <link rel="icon" href="{% static 'img/Logo_3DFácil.png' %}" type="image/png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
@@ -30,12 +33,16 @@
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
             <!-- LOGO -->
+            <div class="flex items-center gap-3">
+                <img src="{% static 'img/Logo_3DFácil.png' %}" alt="3DFácil" width="40" height="40"
+                    class="h-10 w-10 object-contain shrink-0">
 
-            <a href="/" class="text-xl font-bold tracking-tight" style="color: var(--default-color);">
+                <a href="/" class="font-titulo text-2xl font-bold tracking-tight" style="color: var(--default-color);">
 
-                3DFácil
+                    3DFácil
 
-            </a>
+                </a>
+            </div>
 
 
             <!-- NAVEGAÇÃO -->
@@ -115,11 +122,10 @@
                     </p>
                 </div>
 
-                <div class="buscar w-100 p-2 border-2 bg-[#f9f9f9] rounded-xl outline-none text-[14px] flex gap-2" id="buscar">
-                    <i class="bi bi-search"></i>
-                    <input type="text" class="w-full outline-none"
-                        placeholder="Buscar..."
-                        id="inp-produtos">
+                <div
+                    class="buscar w-100 py-2 px-4 border-2 bg-[#f9f9f9] rounded-xl outline-none text-[14px] flex gap-2">
+                    <input type="text" class="w-full outline-none" placeholder="Buscar..." id="buscar_input">
+                    <button id="buscar_btn" class="cursor-pointer"><i class="bi bi-search"></i></button>
                 </div>
 
             </div>
@@ -141,7 +147,7 @@
                 ================================================== -->
 
                 <div
-                    class="group bg-white rounded-2xl overflow-hidden border border-zinc-200 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    class="card_produto group bg-white rounded-2xl overflow-hidden border border-zinc-200 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
 
                     <!-- =================================================
@@ -188,7 +194,7 @@
 
                         <!-- NOME -->
 
-                        <h2 class="text-lg font-semibold text-zinc-900 line-clamp-2">
+                        <h2 class="nome_produto text-lg font-semibold text-zinc-900 line-clamp-2">
 
                             {{ produto.nome }}
 
@@ -386,7 +392,7 @@
 
     </footer>
 
-    <script src="{% static 'js/home.js' %}"></script>
+    <script src="{% static '/js/busca.js' %}"></script>
 
 </body>
 
