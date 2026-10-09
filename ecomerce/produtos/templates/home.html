@@ -115,10 +115,11 @@
                     </p>
                 </div>
 
-                <div class="buscar w-100 p-2 border-2 bg-[#f9f9f9] rounded-xl outline-none text-[14px] flex gap-2">
+                <div class="buscar w-100 p-2 border-2 bg-[#f9f9f9] rounded-xl outline-none text-[14px] flex gap-2" id="buscar">
                     <i class="bi bi-search"></i>
                     <input type="text" class="w-full outline-none"
-                        placeholder="Buscar...">
+                        placeholder="Buscar..."
+                        id="inp-produtos">
                 </div>
 
             </div>
@@ -150,14 +151,14 @@
                     <div class="relative h-64 bg-zinc-50 flex items-center justify-center overflow-hidden">
 
 
-                        {% if produto.imagem %}
+                        {% if produto.foto %}
 
 
                         <!--
                             Produto possui imagem cadastrada.
                         -->
 
-                        <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+                        <img src="{{ produto.foto.url }}" alt="{{ produto.nome }}" class="img_db">
 
 
                         {% else %}
@@ -168,7 +169,7 @@
                             Utiliza imagem padrão.
                         -->
 
-                        <img src="{% static 'img/bulldog_cube.png' %}" alt="{{ produto.nome }}">
+                        <img src="{% static 'img/error.jpg' %}" alt="{{ produto.nome }}" class="img_db img_padrao">
 
 
                         {% endif %}
@@ -199,7 +200,7 @@
 
                         <p class="text-sm text-zinc-500 mt-2">
 
-                            Impressão 3D de alta qualidade.
+                            {{ produto.descricao }}
 
                         </p>
 
@@ -237,12 +238,6 @@
                             style="background-color: var(--default-color);" target="_blank">
 
                             Comprar
-
-                            <span class="text-lg">
-
-                                →
-
-                            </span>
 
                         </a>
 
@@ -391,6 +386,7 @@
 
     </footer>
 
+    <script src="{% static 'js/home.js' %}"></script>
 
 </body>
 

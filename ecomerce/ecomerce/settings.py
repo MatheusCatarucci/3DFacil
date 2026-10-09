@@ -135,14 +135,17 @@ USE_TZ = True
 # URL usada pelo navegador para acessar arquivos estáticos
 STATIC_URL = 'static/'
 
-# Pasta static localizada na raiz do projeto
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-
 
 # ============================================================
 # E-MAIL
 # ============================================================
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# ============================================================
+# MEDIA
+# ============================================================
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
