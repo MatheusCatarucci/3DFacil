@@ -1,16 +1,22 @@
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carrega as variaveis do .env da raiz do repositorio
+load_dotenv(BASE_DIR.parent / '.env')
 
 
 # ============================================================
 # CONFIGURAÇÕES BÁSICAS
 # ============================================================
 
-SECRET_KEY = 'django-insecure-9=$jofr9h*mbm55!dx7ei3zh6j#^j!y*hp(nf0dd#=kco&7jvl'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -89,8 +95,12 @@ WSGI_APPLICATION = 'ecomerce.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'postgres'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'db.supabase.co'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -149,8 +159,23 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # ============================================================
-# MEDIA
+# MEDIA / SUPABASE STORAGE
 # ============================================================
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Bucket do Supabase Storage usado para as fotos dos produtos
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
+SUPABASE_STORAGE_BUCKET = os.environ.get('SUPABASE_STORAGE_BUCKET', 'produtos')
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'produtos.storage.SupabaseStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+}

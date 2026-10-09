@@ -1,152 +1,20 @@
-```gitignore
-# ============================================================
-# PYTHON
-# ============================================================
+# Segredos e credenciais
+.env
+db.sqlite3
 
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Arquivos compilados
-*.pyo
-*.pyd
-
-# ============================================================
-# AMBIENTE VIRTUAL
-# ============================================================
-
-venv/
+*.egg-info/
 .venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+venv/
 
-# ============================================================
-# DJANGO
-# ============================================================
-
-# Arquivos gerados pelo Django
-*.log
-
-# Arquivos de mídia enviados pelos usuários
+# Django
+staticfiles/
 media/
 
-# Arquivos estáticos coletados para produção
-staticfiles/
-
-# ============================================================
-# BANCO DE DADOS
-# ============================================================
-
-# SQLite
-db.sqlite3
-db.sqlite3-journal
-
-# ============================================================
-# VARIÁVEIS DE AMBIENTE / SEGREDOS
-# ============================================================
-
-.env
-.env.*
-!.env.example
-
-# ============================================================
-# IDEs / EDITORES
-# ============================================================
-
-# VS Code
+# Editores / SO
 .vscode/
-
-# PyCharm
 .idea/
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# ============================================================
-# SISTEMA OPERACIONAL
-# ============================================================
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-*.stackdump
-
-# Arquivos temporários do Windows
-$RECYCLE.BIN/
-
-# macOS
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Linux
-*~
-
-# ============================================================
-# TESTES / COBERTURA
-# ============================================================
-
-.coverage
-.coverage.*
-.pytest_cache/
-htmlcov/
-.tox/
-.nox/
-
-# ============================================================
-# LINT / FORMATADORES
-# ============================================================
-
-.mypy_cache/
-.dmypy.json
-dmypy.json
-.ruff_cache/
-
-# ============================================================
-# DOCUMENTAÇÃO / BUILDS
-# ============================================================
-
-docs/_build/
-build/
-dist/
-*.egg-info/
-
-# ============================================================
-# JUPYTER
-# ============================================================
-
-.ipynb_checkpoints/
-
-# ============================================================
-# NODE / FRONTEND
-# ============================================================
-
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# ============================================================
-# CACHE
-# ============================================================
-
-.cache/
-.pyre/
-.pytype/
-
-# ============================================================
-# BACKUPS
-# ============================================================
-
-*.bak
-*.tmp
-*.temp
-*.swp
-*.swo
-```
+Thumbs.db

@@ -1,3 +1,5 @@
 django
 Pillow
 psycopg[binary]
+python-dotenv
+supabase
