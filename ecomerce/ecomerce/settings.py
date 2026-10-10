@@ -18,7 +18,20 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# Em producao o Render injeta o dominio por RENDER_EXTERNAL_URL
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+
+# Se vier vazio, libera tudo. Render define RENDER_EXTERNAL_URL sozinho.
+_render_host = os.environ.get('RENDER_EXTERNAL_URL')
+if _render_host:
+    ALLOWED_HOSTS.append(_render_host)
+
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['*']
 
 
 # ============================================================
@@ -45,6 +58,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Serve os arquivos estaticos pelo proprio Django, sem CDN
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -150,6 +165,21 @@ STATICFILES_DIRS = [
     BASE_DIR / 'assets',
 ]
 
+# Pasta onde o collectstatic junta tudo em producao
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'produtos.storage.SupabaseStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
+
+# Serve os arquivos ja com hash no nome, para cache longo no navegador
+WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365
+
 
 # ============================================================
 # E-MAIL
@@ -170,12 +200,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
 SUPABASE_STORAGE_BUCKET = os.environ.get('SUPABASE_STORAGE_BUCKET', 'produtos')
-
-STORAGES = {
-    'default': {
-        'BACKEND': 'produtos.storage.SupabaseStorage',
-    },
-    'staticfiles': {
-        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-    },
-}
