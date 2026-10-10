@@ -156,7 +156,7 @@
                          IMAGEM
                     ================================================== -->
 
-                    <div class="relative h-64 bg-zinc-50 flex items-center justify-center overflow-hidden">
+                    <div class="relative w-full bg-zinc-50 flex items-center justify-center">
 
 
                         {% if produto.foto %}
@@ -166,7 +166,7 @@
                             Produto possui imagem cadastrada.
                         -->
 
-                        <img src="{{ produto.foto.url }}" alt="{{ produto.nome }}" class="img_db">
+                        <img src="{{ produto.foto.url }}" alt="{{ produto.nome }}" class="img_db block w-full h-auto object-contain" loading="lazy">
 
 
                         {% else %}
@@ -177,7 +177,7 @@
                             Utiliza imagem padrão.
                         -->
 
-                        <img src="{% static 'img/error.jpg' %}" alt="{{ produto.nome }}" class="img_db img_padrao">
+                        <img src="{% static 'img/error.jpg' %}" alt="{{ produto.nome }}" class="img_db img_padrao block w-full h-auto object-contain">
 
 
                         {% endif %}
