@@ -162,6 +162,37 @@ body::-webkit-scrollbar-thumb:hover {
     background: var(--default-color);
 }
 
+/* ==============================
+   CURSOR
+   ============================== */
+
+/*
+    Tudo que da para apertar mostra a mao. Sem isso o navegador
+    fica com a seta em cima de botao, link e item de menu, e da
+    a impressao de que nada ali e clicavel.
+*/
+
+button,
+[type='button'],
+[type='submit'],
+[type='reset'],
+a,
+label,
+summary,
+select {
+    cursor: pointer;
+}
+
+/* O cursor de texto continua valendo no conteudo de verdade. */
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+textarea {
+    cursor: text;
+}
+
 ::selection {
     background-color: var(--default-color);
     color: #fff;
@@ -320,18 +351,9 @@ header nav a[class*='bg-gray-8']:hover {
    ============================== */
 
 /*
-    Esta e a unica animacao de hover que sobrou no site: a foto
-    da capa dá um leve zoom quando o mouse passa por cima.
+    Sem zoom no hover. A imagem mantem object-cover e acompanha
+    o tamanho do card, sem transform.
 */
-
-#produtos > div img {
-    transform: scale(1);
-    transition: transform var(--duration-slow) var(--ease-expo);
-}
-
-#produtos > div:hover img {
-    transform: scale(1.08);
-}
 
 /* ==============================
    TEXTO DO CARD
@@ -901,23 +923,6 @@ button:focus-visible {
 
 
 /* ==============================
-   FEEDBACK DE CLIQUE
-   ============================== */
-
-/* Afunda de leve ao apertar: da a ideia de que o botao respondeu. */
-button:active,
-[type='submit']:active {
-    transform: scale(0.97);
-    transition-duration: 90ms;
-}
-
-button,
-[type='submit'] {
-    transition: transform var(--duration-fast) var(--ease-out),
-                opacity var(--duration-fast) var(--ease-out);
-}
-
-/* ==============================
    ESTADO ENVIANDO (formularios)
    ============================== */
 
@@ -1026,20 +1031,25 @@ button,
     /* pointer-events volta aqui porque o container e none e os
        avisos ainda precisam ser clicaveis para fechar. */
     pointer-events: auto;
+
+    /* Estado inicial: fora da tela, um pouco menor e apagado. */
     opacity: 0;
-    transform: translateX(24px);
-    transition: opacity 0.35s var(--ease-out),
-                transform 0.35s var(--ease-expo);
+    transform: translateX(32px) scale(0.94);
+    transition: opacity 0.4s var(--ease-out),
+                transform 0.45s var(--ease-expo);
 }
 
 .notificacao.entrando {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
 }
 
+/* Sai pelo mesmo caminho, um pouco mais rapido. */
 .notificacao.saindo {
     opacity: 0;
-    transform: translateX(24px);
+    transform: translateX(32px) scale(0.94);
+    transition: opacity 0.28s var(--ease-out),
+                transform 0.28s var(--ease-out);
 }
 
 .notificacao-sucesso {

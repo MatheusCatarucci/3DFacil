@@ -109,13 +109,35 @@
         fechar.textContent = '×';
 
         aviso.append(icone, texto, fechar);
+
+        /*
+            Como cada clique gera um aviso e nao ha trava durante
+            o envio, apertar varias vezes em rapido poderia
+            empilhar dezenas. O mais antigo sai sem animacao para
+            nao ocupar a tela inteira.
+        */
+        const avisosAntigos = area.querySelectorAll('.notificacao');
+        const excedente = avisosAntigos.length - 2;
+
+        for (let i = 0; i < excedente; i += 1) {
+            avisosAntigos[i].remove();
+        }
+
         area.appendChild(aviso);
 
         /*
-            A entrada precisa de um quadro antes: o primeiro pinta
-            o aviso ja na posicao final (opacity 0, deslocado) e
-            so no segundo a classe entra e a transicao roda.
+            Forca o navegador a calcular o estilo do aviso ainda no
+            estado inicial (apagado e fora da tela).
+
+            Sem isso o requestAnimationFrame abaixo entraria em
+            vigor antes do primeiro paint: o quadro seguinte ja
+            pintaria o aviso no lugar final e a transicao ficaria
+            comecar e terminar no mesmo instante, ou seja, sem
+            animacao nenhuma. Ler o offsetWidth e o que garante
+            que o estado inicial exista de verdade.
         */
+        void aviso.offsetWidth;
+
         requestAnimationFrame(function () {
             aviso.classList.add('entrando');
         });
@@ -169,6 +191,11 @@
         Os botoes Comprar nao mudam de pagina: chamam a view por
         fetch e mostram o retorno como notificacao.
 
+        O botao nao trava nem muda de texto durante o envio.
+        Cada clique e uma adicao, entao quem aperta tres vezes
+        leva tres. O limite continua sendo o estoque, que a view
+        aplica no servidor.
+
         Sem JavaScript, o form continua fazendo POST normal e a
         view redireciona para o carrinho. O botao funciona nos
         dois casos.
@@ -180,19 +207,9 @@
             form.addEventListener('submit', function (evento) {
                 evento.preventDefault();
 
-                // Trava contra clique duplo.
-                if (form.dataset.enviando === 'sim') return;
-
-                const botao = form.querySelector('button[type="submit"]');
                 const token = form.querySelector('[name="csrfmiddlewaretoken"]');
 
                 if (!token) return;
-
-                form.dataset.enviando = 'sim';
-
-                const textoOriginal = botao ? botao.textContent.trim() : '';
-
-                if (botao) botao.classList.add('enviando');
 
                 fetch(form.action, {
                     method: 'POST',
@@ -215,27 +232,9 @@
                         if (resultado.corpo.total_itens !== undefined) {
                             atualizarTotal(resultado.corpo.total_itens);
                         }
-
-                        if (resultado.ok && botao) {
-                            // Em vez de voltar ao estado inicial,
-                            // o botao confirma que ja esta no
-                            // carrinho.
-                            botao.textContent = 'No carrinho ✓';
-                        } else if (botao) {
-                            botao.classList.remove('enviando');
-                            botao.textContent = textoOriginal;
-                        }
                     })
                     .catch(function () {
                         notificar('Não foi possível adicionar.', 'erro');
-
-                        if (botao) {
-                            botao.classList.remove('enviando');
-                            botao.textContent = textoOriginal;
-                        }
-                    })
-                    .then(function () {
-                        delete form.dataset.enviando;
                     });
             });
         });
