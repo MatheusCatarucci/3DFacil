@@ -1,21 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&display=swap');
 
 /* ============================================================
-   FONTES
+   3DFácil — folha de estilo principal
+
+   Ordem do arquivo:
+     1. Tokens (variaveis)
+     2. Base
+     3. Tipografia
+     4. Header e navegacao
+     5. Botoes
+     6. Cards de produto
+     7. Footer
+     8. Animacoes (keyframes)
+     9. Revelar ao rolar
+    10. Acessibilidade
+
+   Este arquivo nao usa @layer, entao tem prioridade sobre as
+   utilidades do Tailwind (que ficam dentro de @layer utilities).
+   Por isso da para estilizar os elementos existentes sem usar
+   !important nem mexer no HTML.
    ============================================================ */
 
-/*
-    Chakra Petch — robotic/futurista, só no título da header.
-    Tem pesos reais de 300 a 700, então font-bold / font-medium
-    do Tailwind funcionam de verdade (sem falso negrito).
 
-    Só pedimos 400 e 700 no @import acima para não baixar
-    arquivo de fonte que ninguém usa.
-*/
-.font-titulo {
-    font-family: 'Chakra Petch', sans-serif;
-}
+/* ============================================================
+   1. TOKENS
+   ============================================================ */
 
 :root {
     font-family: 'Montserrat', sans-serif;
@@ -66,15 +76,581 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
 
+    /* Sombras da marca, com o roxo da marca no lugar do preto. */
+    --shadow-brand: 0 10px 30px -10px rgba(138, 5, 190, 0.45);
+    --shadow-brand-lg: 0 20px 45px -12px rgba(138, 5, 190, 0.55);
+    --shadow-card-hover: 0 22px 45px -18px rgba(24, 24, 27, 0.25);
+
     /* ==============================
-       BORDAS
+       BORDAS ARREDONDADAS
     ============================== */
 
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+
+    /* ==============================
+       GRADIENTES
+    ============================== */
+
+    --gradient-brand: linear-gradient(135deg, #a21caf 0%, #8a05be 45%, #6d28d9 100%);
+    --gradient-brand-hover: linear-gradient(135deg, #8a05be 0%, #72049d 45%, #5f0383 100%);
+
+    /* ==============================
+       MOVIMENTO
+    ============================== */
+
+    /* Curvas de aceleracao. ease-out entra suave, expo e spring
+       dao um peso mais premium. */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    --duration-fast: 160ms;
+    --duration-base: 280ms;
+    --duration-slow: 550ms;
+
+    /* ==============================
+       CAMADAS
+    ============================== */
+
+    --z-header: 40;
+    --z-dropdown: 50;
+
+    --header-height: 68px;
+}
+
+
+/* ============================================================
+   2. BASE
+   ============================================================ */
+
+html {
+    scroll-behavior: smooth;
+    /* Compensa o header fixo ao pular para uma ancora. */
+    scroll-padding-top: calc(var(--header-height) + 16px);
 }
 
 body {
     font-family: 'Montserrat', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Barra de rolagem discreta, combinando com a paleta. */
+body::-webkit-scrollbar {
+    width: 11px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #ececef;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #c9c9d1;
+    border-radius: var(--radius-full);
+    border: 3px solid #ececef;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: var(--default-color);
+}
+
+::selection {
+    background-color: var(--default-color);
+    color: #fff;
+}
+
+
+/* ============================================================
+   3. TIPOGRAFIA
+   ============================================================ */
+
+.font-titulo {
+    font-family: 'Chakra Petch', sans-serif;
+}
+
+main h1,
+main h2 {
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+main h1 {
+    color: var(--text-color);
+    animation: surgir-cima 0.7s var(--ease-expo) both;
+}
+
+main h1 + p {
+    animation: surgir-cima 0.7s var(--ease-expo) 0.08s both;
+}
+
+
+/* ============================================================
+   4. HEADER E NAVEGACAO
+   ============================================================ */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background-color: rgba(255, 255, 255, 0.82);
+    /* backdrop-filter da o efeito de vidro fosco atras do menu. */
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    backdrop-filter: blur(14px) saturate(180%);
+    border-bottom: 1px solid transparent;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+}
+
+/* Linha de destaque no topo do header, cresce ao rolar. */
+header::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--gradient-brand);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--duration-slow) var(--ease-expo);
+}
+
+header.rolado::before {
+    transform: scaleX(1);
+}
+
+header > div > a {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: opacity var(--duration-fast) var(--ease-out),
+                transform var(--duration-base) var(--ease-spring);
+}
+
+header > div > a:hover {
+    opacity: 0.85;
+    transform: scale(1.04);
+}
+
+/* ==============================
+   LINKS DO MENU
+   ============================== */
+
+/*
+    O botao do carrinho tambem e um <a> dentro do nav, mas ele tem
+    o formato de botao (rounded-md). O :not() abaixo deixa o
+    sublinhado animado so nos links de texto.
+*/
+
+header nav a:not([class*='rounded-md']) {
+    position: relative;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding-bottom: 4px;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+/* Sublinhado que cresce da esquerda para a direita. */
+header nav a:not([class*='rounded-md'])::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-brand);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform var(--duration-base) var(--ease-expo);
+}
+
+header nav a:not([class*='rounded-md']):hover {
+    color: var(--text-color);
+}
+
+header nav a:not([class*='rounded-md']):hover::after,
+header nav a:not([class*='rounded-md']):focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+}
+
+
+/* ============================================================
+   5. BOTOES
+   ============================================================ */
+
+/* Botao de comprar (dentro do card). */
+#produtos a {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    color: #fff;
+    background-image: var(--gradient-brand);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-brand);
+    transition: transform var(--duration-base) var(--ease-spring),
+                box-shadow var(--duration-base) var(--ease-out),
+                filter var(--duration-fast) var(--ease-out);
+}
+
+/* Brilho que atravessa o botao da esquerda para a direita. */
+#produtos a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.45) 50%,
+        transparent 80%);
+    transform: translateX(-120%);
+    transition: transform 0.65s var(--ease-expo);
+}
+
+#produtos a:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-brand-lg);
+    filter: saturate(1.15);
+}
+
+#produtos a:hover::after {
+    transform: translateX(120%);
+}
+
+#produtos a:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Botao do carrinho, na header. */
+header nav a[class*='bg-gray-8'] {
+    background-image: var(--gradient-brand);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    box-shadow: var(--shadow-brand);
+    transition: transform var(--duration-base) var(--ease-spring),
+                box-shadow var(--duration-base) var(--ease-out);
+}
+
+header nav a[class*='bg-gray-8']:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-brand-lg);
+}
+
+
+/* ============================================================
+   6. CARDS DE PRODUTO
+   ============================================================ */
+
+#produtos > div {
+    position: relative;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--duration-base) var(--ease-expo),
+                box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+}
+
+/* Brilho de roxo passando pela borda superior no hover. */
+#produtos > div::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    z-index: 2;
+    background: var(--gradient-brand);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--duration-base) var(--ease-expo);
+}
+
+#produtos > div:hover {
+    transform: translateY(-6px);
+    border-color: transparent;
+    box-shadow: var(--shadow-card-hover);
+}
+
+#produtos > div:hover::before {
+    transform: scaleX(1);
+}
+
+/* ==============================
+   IMAGEM DO CARD
+   ============================== */
+
+#produtos > div img {
+    transform: scale(1);
+    transition: transform var(--duration-slow) var(--ease-expo),
+                filter var(--duration-base) var(--ease-out);
+}
+
+#produtos > div:hover img {
+    transform: scale(1.08);
+}
+
+/* ==============================
+   TEXTO DO CARD
+   ============================== */
+
+#produtos h2 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+#produtos > div:hover h2 {
+    color: var(--default-color);
+}
+
+#produtos .text-gray-500 {
+    color: var(--text-muted);
+}
+
+#produtos .text-green-600 {
+    background-image: linear-gradient(135deg, #16a34a, #0d9488);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+/* Linha que acompanha o titulo na horizontal. */
+#produtos .p-5 > h2 {
+    position: relative;
+    display: inline-block;
+}
+
+#produtos .p-5 > h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 2px;
+    background: var(--gradient-brand);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--duration-base) var(--ease-expo);
+}
+
+#produtos > div:hover .p-5 > h2::after {
+    transform: scaleX(1);
+}
+
+/* Mensagem de lista vazia. */
+#produtos > p {
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-xl);
+    color: var(--text-muted);
+}
+
+
+/* ============================================================
+   7. FOOTER
+   ============================================================ */
+
+footer {
+    position: relative;
+    background-image: linear-gradient(180deg, #27272a 0%, #18181b 100%);
+    color: #a1a1aa;
+    overflow: hidden;
+}
+
+/* Brilho roxo bem discreto no canto superior direito. */
+footer::before {
+    content: '';
+    position: absolute;
+    top: -140px;
+    right: -100px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(138, 5, 190, 0.32), transparent 68%);
+    pointer-events: none;
+}
+
+footer h3 {
+    font-family: 'Chakra Petch', sans-serif;
+    color: #fff;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+/* Sublinhado roxo que cresce ao passar o mouse. */
+footer h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 28px;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-brand);
+    transition: width var(--duration-base) var(--ease-expo);
+}
+
+footer h3:hover::after {
+    width: 100%;
+}
+
+footer li {
+    transition: transform var(--duration-base) var(--ease-spring);
+}
+
+footer li:hover {
+    transform: translateX(5px);
+}
+
+footer a {
+    position: relative;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+footer a:hover {
+    color: #fff;
+}
+
+footer .border-t {
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #71717a;
+}
+
+
+/* ============================================================
+   8. ANIMACOES (keyframes)
+   ============================================================ */
+
+@keyframes surgir-cima {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes surgir-esquerda {
+    from {
+        opacity: 0;
+        transform: translateX(-24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes surgir-direita {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Entrada do header descendo de leve. */
+header {
+    animation: surgir-cima 0.6s var(--ease-expo) both;
+}
+
+@keyframes pulsar-suave {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.55;
+        transform: scale(0.94);
+    }
+}
+
+
+/* ============================================================
+   9. REVELAR AO ROLAR
+   ============================================================ */
+
+/*
+    A classe .reveal e aplicada pelo motion.js nos elementos
+    selecionados. O observer troca por .is-visible quando o
+    elemento entra na tela.
+*/
+
+.reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s var(--ease-expo),
+                transform 0.8s var(--ease-expo);
+    will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   10. ACESSIBILIDADE
+   ============================================================ */
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--default-color);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+}
+
+/* Quem prefere menos movimento ve tudo estatico. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+
+/* ============================================================
+   IMPRESSAO
+   ============================================================ */
+
+@media print {
+    header,
+    footer {
+        display: none;
+    }
 }

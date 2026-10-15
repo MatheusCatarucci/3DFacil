@@ -14,7 +14,9 @@ load_dotenv(BASE_DIR.parent / '.env')
 # CONFIGURAÇÕES BÁSICAS
 # ============================================================
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# Em dev cai no valor de fallback para o runserver funcionar sem .env.
+# Em producao (Render) a variavel SECRET_KEY e obrigatoria.
+SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-insecure-nao-use-em-producao'
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
@@ -108,14 +110,12 @@ WSGI_APPLICATION = 'ecomerce.wsgi.application'
 # BANCO DE DADOS
 # ============================================================
 
+# Banco local em arquivo, versionado junto do projeto.
+# Nao precisa de nenhum servico externo.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'postgres'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'db.supabase.co'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -170,7 +170,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STORAGES = {
     'default': {
-        'BACKEND': 'produtos.storage.SupabaseStorage',
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
@@ -189,14 +189,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # ============================================================
-# MEDIA / SUPABASE STORAGE
+# MEDIA (fotos enviadas pelo admin)
 # ============================================================
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-
-# Bucket do Supabase Storage usado para as fotos dos produtos
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
-SUPABASE_STORAGE_BUCKET = os.environ.get('SUPABASE_STORAGE_BUCKET', 'produtos')
