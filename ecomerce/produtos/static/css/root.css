@@ -850,6 +850,24 @@ button:focus-visible {
     transition: background-color var(--duration-fast) var(--ease-out);
 }
 
+/*
+    No desktop (1024px, o mesmo ponto do lg do Tailwind) o botao
+    some, porque ali a nav ja aparece inteira.
+
+    Esta regra precisa ficar AQUI e nao como a classe lg:hidden no
+    HTML. Este arquivo nao usa @layer, e em CSS declaracao sem
+    camada sempre ganha de declaracao com camada, nao importa a
+    especificidade. Entao o display:flex acima venceria o
+    display:none do utilitario lg:hidden, e o botao apareceria
+    no meio da header no computador.
+*/
+
+@media (min-width: 1024px) {
+    .menu-botao {
+        display: none;
+    }
+}
+
 .menu-botao:hover {
     background-color: var(--surface-hover);
 }
