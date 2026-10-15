@@ -10,6 +10,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
+
     <title>Produtos</title>
 </head>
 
@@ -78,55 +80,170 @@
 
                 {% for produto in produtos %}
 
-                <!-- CARD DO PRODUTO -->
+                <!--
+                        CARD DO PRODUTO
 
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
+                        A div inteira e clicavel e abre os detalhes.
+                        O botao Comprar fica fora da area expansivel
+                        e nunca abre o card (data-comprar).
+                    -->
 
-                    <!-- IMAGEM DO PRODUTO -->
+                <div class="produto-card bg-white rounded-lg shadow-sm overflow-hidden flex flex-col"
+                    data-cartao>
 
-                    <!--
-                            Mostra a primeira foto cadastrada.
-                            Sem fotos, usa a imagem padrão.
-                        -->
+                    <!-- AREA CLICAVEL: imagem, nome e preco -->
 
-                    {% with primeira=produto.lista_fotos.0 %}
+                    <button type="button" data-expandir aria-expanded="false"
+                        class="w-full text-left cursor-pointer">
 
-                    {% if primeira %}
+                        <!--
+                                Mostra a primeira foto cadastrada.
+                                Sem fotos, usa a imagem padrão.
+                                aspect-square deixa a foto quadrada em
+                                qualquer tamanho de tela.
+                            -->
 
-                    <img src="{% static primeira.imagem %}"
-                        alt="{{ primeira.legenda|default:produto.nome }}" class="h-40 w-full object-cover">
+                        {% with primeira=produto.lista_fotos.0 %}
 
-                    {% else %}
+                        {% if primeira %}
 
-                    <img src="{% static 'img/bulldog_cube.png' %}" alt="{{ produto.nome }}"
-                        class="h-40 w-full object-cover">
+                        <img src="{% static primeira.imagem %}"
+                            alt="{{ primeira.legenda|default:produto.nome }}"
+                            class="w-full aspect-square object-cover">
 
-                    {% endif %}
+                        {% else %}
 
-                    {% endwith %}
+                        <img src="{% static 'img/bulldog_cube.png' %}" alt="{{ produto.nome }}"
+                            class="w-full aspect-square object-cover">
+
+                        {% endif %}
+
+                        {% endwith %}
+
+                        <div class="p-5 pb-3">
+
+                            <h2 class="font-semibold text-gray-800">
+                                {{ produto.nome }}
+                            </h2>
+
+                            {% if produto.descricao %}
+                            <p class="text-sm text-gray-500 mt-1 line-clamp-2">
+                                {{ produto.descricao }}
+                            </p>
+                            {% endif %}
+
+                            <p class="text-xl font-bold text-green-600 mt-2">
+                                R$ {{ produto.preco|floatformat:2 }}
+                            </p>
+
+                            <!-- DICA DE QUE ABRE -->
+
+                            <span class="inline-flex items-center gap-1 mt-3 text-xs font-medium text-gray-400"
+                                data-dica>
+                                Ver detalhes
+                                <span data-seta class="transition-transform duration-300">&#9662;</span>
+                            </span>
+
+                        </div>
+
+                    </button>
 
 
-                    <!-- INFORMAÇÕES DO PRODUTO -->
+                    <!-- BOTÃO COMPRAR (não abre o card) -->
 
-                    <div class="p-5 flex flex-col flex-1">
-
-                        <h2 class="font-semibold text-gray-800">
-                            {{ produto.nome }}
-                        </h2>
-
-                        <p class="text-sm text-gray-500 mt-1">
-                            A partir de
-                        </p>
-
-                        <p class="text-xl font-bold text-green-600 mb-4">
-                            R$ {{ produto.preco|floatformat:2 }}
-                        </p>
-
-
-                        <a href="#"
-                            class="mt-auto text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
+                    <div class="px-5 pb-5">
+                        <a href="#" data-comprar
+                            class="block text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
                             Comprar
                         </a>
+                    </div>
+
+
+                    <!-- =================================================
+                         ÁREA QUE EXPANDE COM OS DETALHES
+                    ================================================== -->
+
+                    <div class="produto-detalhe" data-detalhe>
+
+                        <div class="produto-detalhe-conteudo">
+
+                            <div class="px-5 pb-5 border-t border-gray-100 pt-4">
+
+                                {% with fotos=produto.lista_fotos %}
+
+                                {% if fotos %}
+
+                                <!-- GALERIA -->
+
+                                <div class="galeria relative rounded-lg overflow-hidden bg-gray-800 mb-4"
+                                    data-galeria>
+
+                                    {% for foto in fotos %}
+
+                                    <figure class="hidden cursor-zoom-in" data-foto
+                                        data-legenda="{{ foto.legenda }}">
+
+                                        <img src="{% static foto.imagem %}"
+                                            alt="{{ foto.legenda|default:produto.nome }}"
+                                            class="w-full aspect-square object-cover"
+                                            loading="lazy">
+
+                                    </figure>
+
+                                    {% endfor %}
+
+                                    {% if fotos|length > 1 %}
+
+                                    <button type="button" data-anterior aria-label="Foto anterior"
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 text-white text-2xl leading-none hover:bg-black/70 transition">
+                                        &#8249;
+                                    </button>
+
+                                    <button type="button" data-proxima aria-label="Próxima foto"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 text-white text-2xl leading-none hover:bg-black/70 transition">
+                                        &#8250;
+                                    </button>
+
+                                    <span data-contador aria-live="polite"
+                                        class="absolute bottom-2 right-3 z-10 px-2 py-1 rounded bg-black/60 text-white text-xs tabular-nums"></span>
+
+                                    {% endif %}
+
+                                </div>
+
+                                {% endif %}
+
+                                {% endwith %}
+
+                                <!-- DESCRIÇÃO COMPLETA -->
+
+                                {% if produto.descricao %}
+                                <p class="text-sm text-gray-600 leading-relaxed mb-3">
+                                    {{ produto.descricao|linebreaksbr }}
+                                </p>
+                                {% endif %}
+
+                                <!-- DETALHES -->
+
+                                <dl class="text-sm space-y-1 mb-4">
+                                    <div class="flex justify-between">
+                                        <dt class="text-gray-500">Estoque</dt>
+                                        <dd class="font-medium text-gray-700">{{ produto.estoque }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-gray-500">Código</dt>
+                                        <dd class="font-medium text-gray-700">#{{ produto.id|stringformat:"04d" }}</dd>
+                                    </div>
+                                </dl>
+
+                                <a href="#" data-comprar
+                                    class="block text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
+                                    Comprar agora
+                                </a>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -219,7 +336,7 @@
                 </p>
 
                 <p>
-                    (19) 0000-0000
+                    (19) 99874-2782
                 </p>
 
             </div>
@@ -236,6 +353,10 @@
         </div>
 
     </footer>
+
+    <script src="{% static 'js/motion.js' %}" defer></script>
+
+    <script src="{% static 'js/produto.js' %}" defer></script>
 
 </body>
 
