@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Executado pelo Render durante o build/deploy.
 set -o errexit
 
 pip install -r requirements.txt
