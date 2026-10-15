@@ -1,124 +1,158 @@
 /* ============================================================
-   produto.js — expansão dos cards e galeria de fotos
+   produto.js — modal do produto em tela cheia
 
-   Duas responsabilidades:
+   Um unico modal no fim da pagina, reaproveitado por qualquer
+   card. Os dados de cada produto chegam em uma tag
+   <script type="application/json"> (json_script do Django), que
+   e lida e transformada em objeto aqui.
 
-     1. Abrir e fechar os detalhes do produto quando o card é
-        clicado. O botão "Comprar" nunca dispara a abertura.
-
-     2. Fazer as setas alternarem entre as fotos dentro do card
-        expandido. Com uma foto só, as setas nem são renderizadas.
-
-   Só alterna classes; o layout é resolvido pelo CSS.
+   Fecha de tres formas: no X, no fundo desfocado ou no Esc.
    ============================================================ */
 
 (function () {
     'use strict';
 
-    /* ----------------------------------------------------
-       1. EXPANDIR / FECHAR O CARD
-    ---------------------------------------------------- */
+    const modal = document.getElementById('modal-produto');
 
-    const cards = document.querySelectorAll('[data-cartao]');
+    if (!modal) return;
 
-    cards.forEach(function (card) {
-        const botaoExpandir = card.querySelector('[data-expandir]');
-        const detalhe = card.querySelector('[data-detalhe]');
-        const seta = card.querySelector('[data-seta]');
+    const fundo = modal.querySelector('.modal-fundo');
+    const botaoFechar = modal.querySelector('[data-fechar]');
+    const imgGaleria = modal.querySelector('[data-galeria-img]');
+    const contador = modal.querySelector('[data-galeria-contador]');
+    const setaAnterior = modal.querySelector('[data-galeria-anterior]');
+    const setaProxima = modal.querySelector('[data-galeria-proxima]');
+    const formModal = modal.querySelector('[data-modal-form]');
 
-        if (!detalhe) return;
+    const campoNome = modal.querySelector('[data-modal-nome]');
+    const campoPreco = modal.querySelector('[data-modal-preco]');
+    const campoDescricao = modal.querySelector('[data-modal-descricao]');
+    const campoCodigo = modal.querySelector('[data-modal-codigo]');
+    const campoEstoque = modal.querySelector('[data-modal-estoque]');
+    const campoEstoqueValor = modal.querySelector('[data-modal-estoque-valor]');
 
-        function definir(estado) {
-            card.classList.toggle('aberto', estado);
-            botaoExpandir?.setAttribute('aria-expanded', estado ? 'true' : 'false');
-
-            if (seta) {
-                // Gira a seta para indicar o estado.
-                seta.style.transform = estado ? 'rotate(180deg)' : 'rotate(0deg)';
-            }
-        }
-
-        function alternar() {
-            definir(!card.classList.contains('aberto'));
-        }
-
-        /*
-            O botão cobre a imagem, o nome e o preço. O handler do
-            card cuida das bordas e dos espaços vazios do card, por
-            isso ele ignora cliques que já vieram do botão.
-        */
-        botaoExpandir?.addEventListener('click', alternar);
-
-        card.addEventListener('click', function (evento) {
-            // Botão Comprar: não abre nada.
-            if (evento.target.closest('[data-comprar]')) return;
-
-            // Já tratado pelo botão da área clicável.
-            if (evento.target.closest('[data-expandir]')) return;
-
-            // Dentro da galeria as setas cuidam do próprio clique.
-            if (evento.target.closest('[data-galeria]')) return;
-
-            alternar();
-        });
-
-        card.dataset.estado = 'fechado';
-    });
+    let fotos = [];
+    let indice = 0;
+    let cardAnterior = null;
 
     /* ----------------------------------------------------
-       FECHA COM ESC
+       GALERIA
     ---------------------------------------------------- */
 
-    document.addEventListener('keydown', function (evento) {
-        if (evento.key !== 'Escape') return;
-
-        document.querySelectorAll('[data-cartao].aberto').forEach(function (card) {
-            const botao = card.querySelector('[data-expandir]');
-            const seta = card.querySelector('[data-seta]');
-
-            card.classList.remove('aberto');
-            botao?.setAttribute('aria-expanded', 'false');
-
-            if (seta) seta.style.transform = 'rotate(0deg)';
-        });
-    });
-
-
-    /* ----------------------------------------------------
-       2. GALERIA DE FOTOS
-    ---------------------------------------------------- */
-
-    document.querySelectorAll('[data-galeria]').forEach(function (galeria) {
-        const fotos = Array.from(galeria.querySelectorAll('[data-foto]'));
-        const contador = galeria.querySelector('[data-contador]');
-        const anterior = galeria.querySelector('[data-anterior]');
-        const proxima = galeria.querySelector('[data-proxima]');
-
+    function mostrarFoto(nova) {
         if (!fotos.length) return;
 
-        let atual = 0;
+        // O % faz o ciclo: da ultima volta para a primeira.
+        indice = (nova + fotos.length) % fotos.length;
 
-        function mostrar(indice) {
-            // O % mantém o ciclo: da última volta para a primeira.
-            atual = (indice + fotos.length) % fotos.length;
+        const foto = fotos[indice];
 
-            fotos.forEach(function (foto, i) {
-                foto.classList.toggle('hidden', i !== atual);
-            });
+        imgGaleria.src = foto.src;
+        imgGaleria.alt = foto.legenda || '';
 
-            if (contador) {
-                contador.textContent = (atual + 1) + ' / ' + fotos.length;
-            }
+        contador.textContent = (indice + 1) + ' / ' + fotos.length;
+    }
+
+    setaAnterior.addEventListener('click', function () {
+        mostrarFoto(indice - 1);
+    });
+
+    setaProxima.addEventListener('click', function () {
+        mostrarFoto(indice + 1);
+    });
+
+    /* ----------------------------------------------------
+       ABRIR E FECHAR
+    ---------------------------------------------------- */
+
+    function abrir(card) {
+        cardAnterior = card;
+
+        // Os dados de todos os produtos ficam em uma unica tag JSON,
+        // indexados pelo id. Aqui pegamos o deste card.
+        const container = document.getElementById('dados-produtos');
+
+        if (!container) return;
+
+        const todos = JSON.parse(container.textContent);
+        const dados = todos[card.dataset.produtoId];
+
+        if (!dados) return;
+
+        fotos = dados.fotos || [];
+        indice = 0;
+
+        // Sem foto cadastrada, mostra a imagem padrao do site.
+        if (fotos.length) {
+            mostrarFoto(0);
+        } else {
+            imgGaleria.src = '/static/img/bulldog_cube.png';
+            imgGaleria.alt = dados.nome;
+            contador.textContent = '';
         }
 
-        anterior?.addEventListener('click', function () {
-            mostrar(atual - 1);
-        });
+        // Com uma foto so, as setas ficam escondidas.
+        const varias = fotos.length > 1;
+        setaAnterior.hidden = !varias;
+        setaProxima.hidden = !varias;
+        contador.hidden = !varias;
 
-        proxima?.addEventListener('click', function () {
-            mostrar(atual + 1);
-        });
+        campoNome.textContent = dados.nome;
+        campoPreco.textContent = 'R$ ' + Number(dados.preco).toFixed(2).replace('.', ',');
+        campoDescricao.textContent = dados.descricao || '';
+        campoDescricao.hidden = !dados.descricao;
+        campoCodigo.textContent = '#' + String(dados.id).padStart(4, '0');
+        campoEstoqueValor.textContent = dados.estoque;
 
-        mostrar(0);
+        campoEstoque.textContent = dados.estoque > 0
+            ? 'Em estoque'
+            : 'Produto esgotado';
+
+        formModal.action = '/carrinho/adicionar/' + dados.id + '/';
+        formModal.hidden = dados.estoque <= 0;
+
+        modal.hidden = false;
+        modal.classList.add('modal-aberto');
+
+        // Trava o scroll do fundo enquanto o modal esta aberto.
+        document.body.style.overflow = 'hidden';
+        botaoFechar.focus();
+    }
+
+    function fechar() {
+        modal.classList.remove('modal-aberto');
+        modal.hidden = true;
+        document.body.style.overflow = '';
+
+        // Devolve o foco para o card que foi aberto.
+        cardAnterior?.querySelector('[data-abrir-modal]')?.focus();
+        cardAnterior = null;
+    }
+
+    /* ----------------------------------------------------
+       EVENTOS
+    ---------------------------------------------------- */
+
+    document.querySelectorAll('[data-abrir-modal]').forEach(function (botao) {
+        botao.addEventListener('click', function () {
+            abrir(botao.closest('[data-produto-id]'));
+        });
+    });
+
+    modal.querySelectorAll('[data-fechar]').forEach(function (elemento) {
+        elemento.addEventListener('click', fechar);
+    });
+
+    // Setas do teclado dentro do modal.
+    document.addEventListener('keydown', function (evento) {
+        if (modal.hidden) return;
+
+        if (evento.key === 'Escape') {
+            fechar();
+        } else if (evento.key === 'ArrowLeft') {
+            mostrarFoto(indice - 1);
+        } else if (evento.key === 'ArrowRight') {
+            mostrarFoto(indice + 1);
+        }
     });
 })();

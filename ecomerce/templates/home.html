@@ -78,30 +78,34 @@
 
             <div id="produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
+                <!--
+                    DADOS DOS PRODUTOS PARA O MODAL
+
+                    Uma unica tag com o dicionario inteiro, indexado
+                    pelo id do produto. O filtro json_script escapa
+                    o conteudo, entao texto com HTML dentro da
+                    descricao nao quebra a pagina nem injeta
+                    marcação.
+                -->
+
+                {{ dados_produtos|json_script:"dados-produtos" }}
+
                 {% for produto in produtos %}
 
                 <!--
                         CARD DO PRODUTO
 
-                        A div inteira e clicavel e abre os detalhes.
-                        O botao Comprar fica fora da area expansivel
-                        e nunca abre o card (data-comprar).
+                        Clicar no card abre o modal em tela cheia.
+                        O formulario do carrinho fica fora da area
+                        clicavel, entao Comprar nunca abre o modal.
                     -->
 
                 <div class="produto-card bg-white rounded-lg shadow-sm overflow-hidden flex flex-col"
-                    data-cartao>
+                    data-produto-id="{{ produto.id }}">
 
                     <!-- AREA CLICAVEL: imagem, nome e preco -->
 
-                    <button type="button" data-expandir aria-expanded="false"
-                        class="w-full text-left cursor-pointer">
-
-                        <!--
-                                Mostra a primeira foto cadastrada.
-                                Sem fotos, usa a imagem padrão.
-                                aspect-square deixa a foto quadrada em
-                                qualquer tamanho de tela.
-                            -->
+                    <button type="button" data-abrir-modal class="w-full text-left cursor-pointer">
 
                         {% with primeira=produto.lista_fotos.0 %}
 
@@ -136,12 +140,8 @@
                                 R$ {{ produto.preco|floatformat:2 }}
                             </p>
 
-                            <!-- DICA DE QUE ABRE -->
-
-                            <span class="inline-flex items-center gap-1 mt-3 text-xs font-medium text-gray-400"
-                                data-dica>
+                            <span class="inline-flex items-center gap-1 mt-3 text-xs font-medium text-gray-400">
                                 Ver detalhes
-                                <span data-seta class="transition-transform duration-300">&#9662;</span>
                             </span>
 
                         </div>
@@ -149,105 +149,32 @@
                     </button>
 
 
-                    <!-- BOTÃO COMPRAR (não abre o card) -->
+                    <!-- BOTÃO COMPRAR: envia para o carrinho -->
 
                     <div class="px-5 pb-5">
-                        <a href="#" data-comprar
-                            class="block text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
-                            Comprar
-                        </a>
-                    </div>
 
+                        {% if produto.estoque > 0 %}
 
-                    <!-- =================================================
-                         ÁREA QUE EXPANDE COM OS DETALHES
-                    ================================================== -->
+                        <form method="post" action="{% url 'carrinho:adicionar' produto.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="w-full text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
+                                Comprar
+                            </button>
+                        </form>
 
-                    <div class="produto-detalhe" data-detalhe>
+                        {% else %}
 
-                        <div class="produto-detalhe-conteudo">
+                        <span class="block text-center bg-gray-200 text-gray-500 py-2 rounded-md cursor-not-allowed">
+                            Sem estoque
+                        </span>
 
-                            <div class="px-5 pb-5 border-t border-gray-100 pt-4">
-
-                                {% with fotos=produto.lista_fotos %}
-
-                                {% if fotos %}
-
-                                <!-- GALERIA -->
-
-                                <div class="galeria relative rounded-lg overflow-hidden bg-gray-800 mb-4"
-                                    data-galeria>
-
-                                    {% for foto in fotos %}
-
-                                    <figure class="hidden cursor-zoom-in" data-foto
-                                        data-legenda="{{ foto.legenda }}">
-
-                                        <img src="{% static foto.imagem %}"
-                                            alt="{{ foto.legenda|default:produto.nome }}"
-                                            class="w-full aspect-square object-cover"
-                                            loading="lazy">
-
-                                    </figure>
-
-                                    {% endfor %}
-
-                                    {% if fotos|length > 1 %}
-
-                                    <button type="button" data-anterior aria-label="Foto anterior"
-                                        class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 text-white text-2xl leading-none hover:bg-black/70 transition">
-                                        &#8249;
-                                    </button>
-
-                                    <button type="button" data-proxima aria-label="Próxima foto"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 text-white text-2xl leading-none hover:bg-black/70 transition">
-                                        &#8250;
-                                    </button>
-
-                                    <span data-contador aria-live="polite"
-                                        class="absolute bottom-2 right-3 z-10 px-2 py-1 rounded bg-black/60 text-white text-xs tabular-nums"></span>
-
-                                    {% endif %}
-
-                                </div>
-
-                                {% endif %}
-
-                                {% endwith %}
-
-                                <!-- DESCRIÇÃO COMPLETA -->
-
-                                {% if produto.descricao %}
-                                <p class="text-sm text-gray-600 leading-relaxed mb-3">
-                                    {{ produto.descricao|linebreaksbr }}
-                                </p>
-                                {% endif %}
-
-                                <!-- DETALHES -->
-
-                                <dl class="text-sm space-y-1 mb-4">
-                                    <div class="flex justify-between">
-                                        <dt class="text-gray-500">Estoque</dt>
-                                        <dd class="font-medium text-gray-700">{{ produto.estoque }}</dd>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <dt class="text-gray-500">Código</dt>
-                                        <dd class="font-medium text-gray-700">#{{ produto.id|stringformat:"04d" }}</dd>
-                                    </div>
-                                </dl>
-
-                                <a href="#" data-comprar
-                                    class="block text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
-                                    Comprar agora
-                                </a>
-
-                            </div>
-
-                        </div>
+                        {% endif %}
 
                     </div>
 
                 </div>
+
 
 
                 {% empty %}
@@ -353,6 +280,91 @@
         </div>
 
     </footer>
+
+    <!-- =====================================================
+         MODAL DO PRODUTO (tela cheia)
+         Fica no fim do body e e reaproveitado por qualquer card.
+    ====================================================== -->
+
+    <div id="modal-produto" class="modal-produto" hidden
+        role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+
+        <!-- FUNDO: desfoca e escurece. Clicar aqui fecha o modal. -->
+
+        <div class="modal-fundo" data-fechar></div>
+
+        <!-- PAINEL -->
+
+        <div class="modal-painel">
+
+            <!-- BOTÃO FECHAR -->
+
+            <button type="button" data-fechar aria-label="Fechar"
+                class="modal-fechar">
+                &#10005;
+            </button>
+
+            <div class="modal-grade">
+
+                <!-- GALERIA -->
+
+                <div class="modal-galeria">
+                    <div class="modal-galeria-area" data-galeria-area>
+
+                        <img data-galeria-img src="" alt=""
+                            class="w-full h-full object-contain">
+
+                    </div>
+
+                    <button type="button" data-galeria-anterior aria-label="Foto anterior"
+                        class="modal-seta modal-seta-esquerda">&#8249;</button>
+
+                    <button type="button" data-galeria-proxima aria-label="Próxima foto"
+                        class="modal-seta modal-seta-direita">&#8250;</button>
+
+                    <span data-galeria-contador aria-live="polite"
+                        class="modal-contador"></span>
+                </div>
+
+                <!-- INFORMAÇÕES -->
+
+                <div class="modal-info">
+
+                    <h2 id="modal-titulo" data-modal-nome class="modal-nome"></h2>
+
+                    <p data-modal-preco class="modal-preco"></p>
+
+                    <p data-modal-estoque class="modal-estoque"></p>
+
+                    <div data-modal-descricao class="modal-descricao"></div>
+
+                    <dl class="modal-detalhes">
+                        <div>
+                            <dt>Código</dt>
+                            <dd data-modal-codigo></dd>
+                        </div>
+                        <div>
+                            <dt>Estoque</dt>
+                            <dd data-modal-estoque-valor></dd>
+                        </div>
+                    </dl>
+
+                    <form method="post" action="{% url 'carrinho:adicionar' 0 %}" data-modal-form
+                        class="modal-form">
+                        {% csrf_token %}
+                        <button type="submit" class="modal-comprar">
+                            Comprar agora
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 
     <script src="{% static 'js/motion.js' %}" defer></script>
 
