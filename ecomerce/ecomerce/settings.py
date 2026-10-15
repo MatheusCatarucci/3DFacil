@@ -98,6 +98,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # Deixa a quantidade do carrinho visivel em todo
+                # template, para o badge do menu aparecer sempre.
+                'carrinho.context_processors.carrinho_ativo',
             ],
         },
     },

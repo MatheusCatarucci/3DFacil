@@ -103,9 +103,11 @@
     ============================== */
 
     /* Curvas de aceleracao. expo da um atraso premium e entra
-       suave, out e o padrao das transicoes curtas. */
+       suave, out e o padrao das transicoes curtas e spring
+       serve para os "pulos" (badge do carrinho). */
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     --duration-fast: 160ms;
     --duration-base: 280ms;
@@ -225,21 +227,21 @@ header > div > a:hover {
    ============================== */
 
 /*
-    O :not() segue necessario: ele impede que a cor e o peso sejam
-    aplicados no botao do carrinho, que precisa manter o branco do
-    Tailwind.
+    O :not() separa os links de texto do botao de carrinho, que
+    precisa manter o branco do Tailwind sobre o fundo roxo.
 
-    O hover aqui e so mudanca de cor. Nenhuma barra sublinhada
-    crescendo, de proposito.
+    O filtro e pela classe rounded-full, que so o botao tem. Se
+    voce trocar o arredondamento do botao no template, troque
+    aqui tambem, senao a regra comeca a pegar o link errado.
 */
 
-header nav a:not([class*='rounded-md']) {
+header nav a:not([class*='rounded-full']) {
     font-weight: 500;
     color: var(--text-secondary);
     transition: color var(--duration-base) var(--ease-out);
 }
 
-header nav a:not([class*='rounded-md']):hover {
+header nav a:not([class*='rounded-full']):hover {
     color: var(--default-color);
 }
 
@@ -802,7 +804,294 @@ button:focus-visible {
 
 
 /* ============================================================
-   IMPRESSAO
+   12. INTERACOES E MENU
+   ============================================================ */
+
+/* ==============================
+   MENU MOBILE
+   ============================== */
+
+/*
+    No desktop a nav fica sempre visivel e o botao some (lg:hidden).
+    No celular a nav vira um painel que desliza para baixo.
+*/
+
+.menu-botao {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0 0.6rem;
+    border-radius: var(--radius-md);
+    transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.menu-botao:hover {
+    background-color: var(--surface-hover);
+}
+
+.menu-barra {
+    display: block;
+    height: 2px;
+    width: 100%;
+    border-radius: var(--radius-full);
+    background-color: var(--text-color);
+    transform-origin: center;
+    transition: transform var(--duration-base) var(--ease-expo),
+                opacity var(--duration-fast) var(--ease-out);
+}
+
+/* As tres barras viram um X. */
+.menu-botao[aria-expanded='true'] .menu-barra:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-botao[aria-expanded='true'] .menu-barra:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0.2);
+}
+
+.menu-botao[aria-expanded='true'] .menu-barra:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.menu-mobile {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s var(--ease-expo),
+                opacity var(--duration-base) var(--ease-out);
+}
+
+.menu-mobile.aberto {
+    max-height: 22rem;
+    opacity: 1;
+}
+
+/* Os links entram um a um. O --i e o indice, definido no HTML. */
+.menu-mobile a {
+    display: block;
+    padding: 0.7rem 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.35s var(--ease-out),
+                transform 0.35s var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                padding-left var(--duration-base) var(--ease-out);
+}
+
+.menu-mobile.aberto a {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.menu-mobile.aberto a:nth-child(1) { transition-delay: 0.06s; }
+.menu-mobile.aberto a:nth-child(2) { transition-delay: 0.11s; }
+.menu-mobile.aberto a:nth-child(3) { transition-delay: 0.16s; }
+.menu-mobile.aberto a:nth-child(4) { transition-delay: 0.21s; }
+
+.menu-mobile a:hover {
+    color: var(--default-color);
+    padding-left: 0.6rem;
+}
+
+
+/* ==============================
+   FEEDBACK DE CLIQUE
+   ============================== */
+
+/* Afunda de leve ao apertar: da a ideia de que o botao respondeu. */
+button:active,
+[type='submit']:active {
+    transform: scale(0.97);
+    transition-duration: 90ms;
+}
+
+button,
+[type='submit'] {
+    transition: transform var(--duration-fast) var(--ease-out),
+                opacity var(--duration-fast) var(--ease-out);
+}
+
+/* ==============================
+   ESTADO ENVIANDO (formularios)
+   ============================== */
+
+/*
+    Enquanto o POST vai para o servidor, o botao fica apagado e
+    ganha um giro. Evita o clique duplo e mostra que algo houve.
+*/
+
+.enviando {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.girando {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    margin-right: 0.5em;
+    vertical-align: -0.1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==============================
+   BADGE DO CARRINHO
+   ============================== */
+
+/*
+    Da um pulo quando a pagina carrega com itens no carrinho:
+    o olho vai direto para o icone.
+*/
+
+.carrinho-badge {
+    animation: pulsar-badge 0.6s var(--ease-spring) both;
+}
+
+@keyframes pulsar-badge {
+    0% {
+        transform: scale(0.4);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.18);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==============================
+   ITENS DO CARRINHO
+   ============================== */
+
+/* Entrada suave de cada item da lista. */
+.carrinho-item {
+    animation: surgir-cima 0.5s var(--ease-expo) both;
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-out);
+}
+
+.carrinho-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+
+/* ==============================
+   NOTIFICACOES (TOAST)
+   ============================== */
+
+.notificacoes {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.notificacao {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 22rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: #18181b;
+    color: #fff;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    box-shadow: 0 16px 40px -14px rgba(0, 0, 0, 0.55);
+
+    /* pointer-events volta aqui porque o container e none e os
+       avisos ainda precisam ser clicaveis para fechar. */
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateX(24px);
+    transition: opacity 0.35s var(--ease-out),
+                transform 0.35s var(--ease-expo);
+}
+
+.notificacao.entrando {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notificacao.saindo {
+    opacity: 0;
+    transform: translateX(24px);
+}
+
+.notificacao-sucesso {
+    background-color: #14532d;
+}
+
+.notificacao-erro {
+    background-color: #991b1b;
+}
+
+.notificacao-icone {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.18);
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.notificacao-fechar {
+    flex-shrink: 0;
+    margin-left: 0.25rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    line-height: 1;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.notificacao-fechar:hover {
+    color: #fff;
+}
+
+/* No celular fica no rodape, ocupando a largura util. */
+@media (max-width: 640px) {
+    .notificacoes {
+        left: 1rem;
+        right: 1rem;
+        align-items: stretch;
+    }
+
+    .notificacao {
+        max-width: none;
+    }
+}
+
+
+/* ============================================================
+   IMPRESSÃO
    ============================================================ */
 
 @media print {

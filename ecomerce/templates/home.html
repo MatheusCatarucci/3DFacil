@@ -29,7 +29,19 @@
                 3DFácil
             </a>
 
-            <nav class="flex items-center gap-6 text-sm text-gray-600">
+            <!-- BOTÃO DO MENU (só no celular) -->
+
+            <button type="button" data-menu-botao
+                aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile"
+                class="menu-botao lg:hidden">
+
+                <span class="menu-barra"></span>
+                <span class="menu-barra"></span>
+                <span class="menu-barra"></span>
+
+            </button>
+
+            <nav class="hidden lg:flex items-center gap-6 text-sm text-gray-600">
 
                 <a href="/" class="hover:text-gray-900">
                     Início
@@ -44,11 +56,53 @@
                     Contato
                 </a>
 
-                <a href="#" class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                    Carrinho
+                <a href="{% url 'carrinho:index' %}"
+                    class="inline-flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700">
+
+                    <span data-caixa-badge {% if not total_itens %}hidden{% endif %}>
+                        <span data-total-carrinho
+                            class="carrinho-badge min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-white text-gray-800 text-xs font-bold">
+                            {{ total_itens|default:0 }}
+                        </span>
+                    </span>
+
+                    <span>Carrinho</span>
+
                 </a>
 
             </nav>
+
+        </div>
+
+
+        <!-- =====================================================
+             MENU MOBILE (fica escondido a partir de lg)
+        ====================================================== -->
+
+        <div id="menu-mobile" class="menu-mobile lg:hidden">
+
+            <div class="max-w-5xl mx-auto px-4 pb-3">
+
+                <a href="/">Início</a>
+
+                <a href="/#produtos">Produtos</a>
+
+                <a href="https://wa.me/5519998742782?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%203DF%C3%A1cil"
+                    target="_blank" rel="noopener noreferrer">
+                    Contato
+                </a>
+
+                <a href="{% url 'carrinho:index' %}">
+                    Carrinho
+                    <span data-caixa-badge {% if not total_itens %}hidden{% endif %}>
+                        <span data-total-carrinho
+                            class="ml-1 px-1.5 py-0.5 rounded-full bg-gray-800 text-white text-xs font-bold">
+                            {{ total_itens|default:0 }}
+                        </span>
+                    </span>
+                </a>
+
+            </div>
 
         </div>
 
@@ -366,9 +420,19 @@
     </div>
 
 
+    <!-- =====================================================
+         AREA DAS NOTIFICACOES
+         O JS cria e remove os avisos aqui dentro.
+    ====================================================== -->
+
+    <div id="notificacoes" class="notificacoes" aria-live="polite" aria-atomic="false"></div>
+
+
     <script src="{% static 'js/motion.js' %}" defer></script>
 
     <script src="{% static 'js/produto.js' %}" defer></script>
+
+    <script src="{% static 'js/ui.js' %}" defer></script>
 
 </body>
 

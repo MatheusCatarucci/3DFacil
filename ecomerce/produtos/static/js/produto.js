@@ -111,8 +111,25 @@
         formModal.action = '/carrinho/adicionar/' + dados.id + '/';
         formModal.hidden = dados.estoque <= 0;
 
+        /*
+            Abrir em duas etapas.
+
+            Se tirar o hidden e adicionar a classe na mesma hora, o
+            navegador nunca chega a pintar o estado fechado: o
+            elemento salta de display:none direto para o estado
+            final e a transicao nao tem de onde para onde ir, ou
+            seja, nao anima nada.
+
+            Forcar um reflow faz o estilo ser calculado com o estado
+            fechado, e so no quadro seguinte a classe entra.
+        */
         modal.hidden = false;
-        modal.classList.add('modal-aberto');
+        modal.classList.remove('modal-aberto');
+        void modal.offsetWidth;
+
+        requestAnimationFrame(function () {
+            modal.classList.add('modal-aberto');
+        });
 
         // Trava o scroll do fundo enquanto o modal esta aberto.
         document.body.style.overflow = 'hidden';
@@ -121,8 +138,30 @@
 
     function fechar() {
         modal.classList.remove('modal-aberto');
-        modal.hidden = true;
         document.body.style.overflow = '';
+
+        /*
+            O display:none so vem depois da transicao terminar,
+            senao o painel sumiria de um golpe e o efeito de
+            fechar tambem nao apareceria.
+
+            O setTimeout e a rede de seguranca: se a transicao
+            nao rodar (movimento reduzido, aba em segundo plano),
+            o transitionend pode nunca chegar e o modal ficaria
+            preso na tela.
+        */
+        let encerrado = false;
+
+        const finalizar = function () {
+            if (encerrado) return;
+            encerrado = true;
+
+            modal.hidden = true;
+            modal.removeEventListener('transitionend', finalizar);
+        };
+
+        modal.addEventListener('transitionend', finalizar);
+        setTimeout(finalizar, 450);
 
         // Devolve o foco para o card que foi aberto.
         cardAnterior?.querySelector('[data-abrir-modal]')?.focus();

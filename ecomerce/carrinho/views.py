@@ -3,6 +3,7 @@ from urllib.parse import quote
 
 from django.contrib import messages
 from django.db.models import Prefetch
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 
@@ -11,6 +12,11 @@ from produtos.models import Produto, ProdutoFoto
 from . import sessao
 
 WHATSAPP = 'https://wa.me/5519998742782'
+
+
+def _eh_ajax(request):
+    """A chamada veio do fetch do navegador, e nao de um form comum."""
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
 
 def _montar_itens(request):
@@ -102,7 +108,14 @@ def index(request):
 
 
 def adicionar(request, produto_id):
-    """Recebe o POST do botao Comprar e manda para o carrinho."""
+    """
+    Recebe o POST do botao Comprar.
+
+    Chamado por JavaScript devolve JSON e a pagina nao recarrega,
+    com a notificacao aparecendo no lugar. Chamado por um form
+    comum (sem JavaScript) continua redirecionando para o
+    carrinho, entao o botao nunca fica sem funcao.
+    """
     produto = get_object_or_404(Produto, pk=produto_id)
 
     # Aceita so POST: mudar o carrinho por GET permitiria que um
@@ -110,15 +123,40 @@ def adicionar(request, produto_id):
     if request.method != 'POST':
         return redirect('carrinho:index')
 
-    if produto.estoque <= 0:
-        messages.error(request, 'Esse produto está sem estoque.')
-    else:
-        quantidade = sessao.adicionar(request, produto)
+    ajax = _eh_ajax(request)
 
-        if quantidade:
-            messages.success(request, f'"{produto.nome}" foi para o carrinho.')
-        else:
-            messages.error(request, 'Não foi possível adicionar o produto.')
+    if produto.estoque <= 0:
+        texto = f'"{produto.nome}" está sem estoque.'
+
+        if ajax:
+            return JsonResponse(
+                {'ok': False, 'mensagem': texto},
+                status=400,
+            )
+
+        messages.error(request, texto)
+        return redirect('carrinho:index')
+
+    quantidade = sessao.adicionar(request, produto)
+
+    if quantidade:
+        texto = f'"{produto.nome}" foi para o carrinho.'
+    else:
+        texto = 'Não foi possível adicionar o produto.'
+
+    if ajax:
+        return JsonResponse({
+            'ok': bool(quantidade),
+            'mensagem': texto,
+            'total_itens': sessao.total_itens(request),
+            'quantidade': quantidade,
+            'estoque': produto.estoque,
+        })
+
+    if quantidade:
+        messages.success(request, texto)
+    else:
+        messages.error(request, texto)
 
     return redirect('carrinho:index')
 
