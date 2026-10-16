@@ -1,12 +1,17 @@
+
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
-# Caminho base do projeto
+# ============================================================
+# CAMINHOS E VARIÁVEIS DE AMBIENTE
+# ============================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Carrega as variaveis do .env da raiz do repositorio
+# Carrega o .env da raiz do repositório, se existir
 load_dotenv(BASE_DIR.parent / '.env')
 
 
@@ -14,26 +19,42 @@ load_dotenv(BASE_DIR.parent / '.env')
 # CONFIGURAÇÕES BÁSICAS
 # ============================================================
 
-# Em dev cai no valor de fallback para o runserver funcionar sem .env.
-# Em producao (Render) a variavel SECRET_KEY e obrigatoria.
 SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-insecure-nao-use-em-producao'
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Em producao o Render injeta o dominio por RENDER_EXTERNAL_URL
+# Domínios permitidos pelo Django
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get('ALLOWED_HOSTS', '').split(',')
     if host.strip()
 ]
 
-# Se vier vazio, libera tudo. Render define RENDER_EXTERNAL_URL sozinho.
-_render_host = os.environ.get('RENDER_EXTERNAL_URL')
-if _render_host:
-    ALLOWED_HOSTS.append(_render_host)
+# Adiciona o domínio do Render sem https://
+_render_url = os.environ.get('RENDER_EXTERNAL_URL')
 
-if not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = ['*']
+if _render_url:
+    _render_host = urlparse(_render_url).hostname
+
+    if _render_host:
+        ALLOWED_HOSTS.append(_render_host)
+
+# Permite o acesso local durante o desenvolvimento
+if not ALLOWED_HOSTS and DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# Origens confiáveis para requisições HTTPS e formulários
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
+if _render_url:
+    _render_origin = f'https://{urlparse(_render_url).netloc}'
+
+    if _render_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_render_origin)
 
 
 # ============================================================
@@ -48,7 +69,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Nossos apps
     'produtos',
     'carrinho',
     'usuarios',
@@ -61,7 +81,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # Serve os arquivos estaticos pelo proprio Django, sem CDN
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,6 +97,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ecomerce.urls'
 
+WSGI_APPLICATION = 'ecomerce.wsgi.application'
+
 
 # ============================================================
 # TEMPLATES
@@ -86,21 +107,15 @@ ROOT_URLCONF = 'ecomerce.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
         'DIRS': [
             BASE_DIR / 'templates',
         ],
-
         'APP_DIRS': True,
-
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                # Deixa a quantidade do carrinho visivel em todo
-                # template, para o badge do menu aparecer sempre.
                 'carrinho.context_processors.carrinho_ativo',
             ],
         },
@@ -108,15 +123,10 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = 'ecomerce.wsgi.application'
-
-
 # ============================================================
 # BANCO DE DADOS
 # ============================================================
 
-# Banco local em arquivo, versionado junto do projeto.
-# Nao precisa de nenhum servico externo.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -162,15 +172,12 @@ USE_TZ = True
 # ARQUIVOS ESTÁTICOS
 # ============================================================
 
-# URL usada pelo navegador para acessar arquivos estáticos
 STATIC_URL = '/static/'
 
-# Pastas de arquivos estáticos localizadas na raiz do projeto
 STATICFILES_DIRS = [
     BASE_DIR / 'assets',
 ]
 
-# Pasta onde o collectstatic junta tudo em producao
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STORAGES = {
@@ -182,7 +189,6 @@ STORAGES = {
     },
 }
 
-# Serve os arquivos ja com hash no nome, para cache longo no navegador
 WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365
 
 
@@ -194,8 +200,21 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # ============================================================
-# MEDIA (fotos enviadas pelo admin)
+# ARQUIVOS DE MÍDIA
 # ============================================================
 
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# ============================================================
+# SEGURANÇA EM PRODUÇÃO
+# ============================================================
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
