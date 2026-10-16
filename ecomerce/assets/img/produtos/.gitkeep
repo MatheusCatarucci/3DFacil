@@ -1,0 +1,5 @@
+﻿# Coloque aqui as fotos dos produtos.
+#
+# Exemplo: assets/img/produtos/capa-hd.jpg
+# Depois cadastre o caminho no admin em /admin/produtos/produto/
+# (campo 'imagem'), usando o mesmo caminho relativo com barra normal.

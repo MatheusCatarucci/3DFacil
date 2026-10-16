@@ -1,0 +1,444 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
+
+    <title>Produtos</title>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="bg-white shadow-sm">
+
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+
+            <a href="/" class="text-xl font-bold text-gray-800">
+                3DFácil
+            </a>
+
+            <!--
+                BOTÃO DO MENU
+
+                Só no celular. A regra que esconde no desktop
+                esta no root.css (ver comentário do .menu-botao).
+            -->
+
+            <button type="button" data-menu-botao
+                aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile"
+                class="menu-botao">
+
+                <span class="menu-barra"></span>
+                <span class="menu-barra"></span>
+                <span class="menu-barra"></span>
+
+            </button>
+
+            <nav class="hidden lg:flex items-center gap-6 text-sm text-gray-600">
+
+                <a href="/" class="hover:text-gray-900">
+                    Início
+                </a>
+
+                <a href="#produtos" class="hover:text-gray-900">
+                    Produtos
+                </a>
+
+                <a href="https://wa.me/5519998742782?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%203DF%C3%A1cil"
+                    class="hover:text-gray-900">
+                    Contato
+                </a>
+
+                <a href="{% url 'carrinho:index' %}"
+                    class="inline-flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700">
+
+                    <span data-caixa-badge {% if not total_itens %}hidden{% endif %}>
+                        <span data-total-carrinho
+                            class="carrinho-badge min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-white text-gray-800 text-xs font-bold">
+                            {{ total_itens|default:0 }}
+                        </span>
+                    </span>
+
+                    <span>Carrinho</span>
+
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <!-- =====================================================
+             MENU MOBILE (fica escondido a partir de lg)
+        ====================================================== -->
+
+        <div id="menu-mobile" class="menu-mobile lg:hidden">
+
+            <div class="max-w-5xl mx-auto px-4 pb-3">
+
+                <a href="/">Início</a>
+
+                <a href="/#produtos">Produtos</a>
+
+                <a href="https://wa.me/5519998742782?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%203DF%C3%A1cil"
+                    target="_blank" rel="noopener noreferrer">
+                    Contato
+                </a>
+
+                <a href="{% url 'carrinho:index' %}">
+                    Carrinho
+                    <span data-caixa-badge {% if not total_itens %}hidden{% endif %}>
+                        <span data-total-carrinho
+                            class="ml-1 px-1.5 py-0.5 rounded-full bg-gray-800 text-white text-xs font-bold">
+                            {{ total_itens|default:0 }}
+                        </span>
+                    </span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
+
+    <main class="flex-1">
+
+        <section class="max-w-5xl mx-auto px-4 py-10">
+
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                Produtos
+            </h1>
+
+            <p class="text-gray-500 mb-8">
+                Confira nossos produtos disponíveis.
+            </p>
+
+
+            <!-- =================================================
+                 LISTA DE PRODUTOS
+            ================================================== -->
+
+            <div id="produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!--
+                    DADOS DOS PRODUTOS PARA O MODAL
+
+                    Uma unica tag com o dicionario inteiro, indexado
+                    pelo id do produto. O filtro json_script escapa
+                    o conteudo, entao texto com HTML dentro da
+                    descricao nao quebra a pagina nem injeta
+                    marcação.
+                -->
+
+                {{ dados_produtos|json_script:"dados-produtos" }}
+
+                {% for produto in produtos %}
+
+                <!--
+                        CARD DO PRODUTO
+
+                        Clicar no card abre o modal em tela cheia.
+                        O formulario do carrinho fica fora da area
+                        clicavel, entao Comprar nunca abre o modal.
+                    -->
+
+                <div class="produto-card bg-white rounded-lg shadow-sm overflow-hidden flex flex-col"
+                    data-produto-id="{{ produto.id }}">
+
+                    <!-- AREA CLICAVEL: imagem, nome e preco -->
+
+                    <button type="button" data-abrir-modal class="w-full text-left cursor-pointer">
+
+                        {% with primeira=produto.lista_fotos.0 %}
+
+                        {% if primeira %}
+
+                        <img src="{% static primeira.imagem %}"
+                            alt="{{ primeira.legenda|default:produto.nome }}"
+                            class="w-full aspect-square object-cover">
+
+                        {% else %}
+
+                        <img src="{% static 'img/bulldog_cube.png' %}" alt="{{ produto.nome }}"
+                            class="w-full aspect-square object-cover">
+
+                        {% endif %}
+
+                        {% endwith %}
+
+                        <div class="p-5 pb-3">
+
+                            <h2 class="font-semibold text-gray-800">
+                                {{ produto.nome }}
+                            </h2>
+
+                            {% if produto.descricao %}
+                            <p class="text-sm text-gray-500 mt-1 line-clamp-2">
+                                {{ produto.descricao }}
+                            </p>
+                            {% endif %}
+
+                            <p class="text-xl font-bold text-green-600 mt-2">
+                                R$ {{ produto.preco|floatformat:2 }}
+                            </p>
+
+                            <span class="inline-flex items-center gap-1 mt-3 text-xs font-medium text-gray-400">
+                                Ver detalhes
+                            </span>
+
+                        </div>
+
+                    </button>
+
+
+                    <!-- BOTÃO COMPRAR: envia para o carrinho -->
+
+                    <div class="px-5 pb-5">
+
+                        {% if produto.estoque > 0 %}
+
+                        <form method="post" action="{% url 'carrinho:adicionar' produto.pk %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="w-full text-center bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700">
+                                Comprar
+                            </button>
+                        </form>
+
+                        {% else %}
+
+                        <span class="block text-center bg-gray-200 text-gray-500 py-2 rounded-md cursor-not-allowed">
+                            Sem estoque
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                {% empty %}
+
+                <!-- CASO NÃO TENHA PRODUTOS -->
+
+                <p class="col-span-full bg-white rounded-lg shadow-sm px-5 py-8 text-center text-gray-500">
+                    Nenhum produto cadastrado
+                </p>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer id="contato" class="bg-gray-800 text-gray-300">
+
+        <div class="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+
+            <!-- SOBRE -->
+
+            <div>
+
+                <h3 class="font-semibold text-white mb-2">
+                    3DFácil
+                </h3>
+
+                <p>
+                    Qualidade e bom preço desde sempre.
+                </p>
+
+            </div>
+
+
+            <!-- LINKS -->
+
+            <div>
+
+                <h3 class="font-semibold text-white mb-2">
+                    Links
+                </h3>
+
+                <ul class="space-y-1">
+
+                    <li>
+                        <a href="/" class="hover:text-white">
+                            Início
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#produtos" class="hover:text-white">
+                            Produtos
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="hover:text-white">
+                            Carrinho
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- CONTATO -->
+
+            <div>
+
+                <h3 class="font-semibold text-white mb-2">
+                    Contato
+                </h3>
+
+                <p>
+                    matheus.catarucci7@gmail.com
+                </p>
+
+                <p>
+                    (19) 99874-2782
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- COPYRIGHT -->
+
+        <div class="border-t border-gray-700 text-center text-xs py-4">
+
+            &copy; 2026 3DFácil. Todos os direitos reservados.
+
+        </div>
+
+    </footer>
+
+    <!-- =====================================================
+         MODAL DO PRODUTO (tela cheia)
+         Fica no fim do body e e reaproveitado por qualquer card.
+    ====================================================== -->
+
+    <div id="modal-produto" class="modal-produto" hidden
+        role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+
+        <!-- FUNDO: desfoca e escurece. Clicar aqui fecha o modal. -->
+
+        <div class="modal-fundo" data-fechar></div>
+
+        <!-- PAINEL -->
+
+        <div class="modal-painel">
+
+            <!-- BOTÃO FECHAR -->
+
+            <button type="button" data-fechar aria-label="Fechar"
+                class="modal-fechar">
+                &#10005;
+            </button>
+
+            <div class="modal-grade">
+
+                <!-- GALERIA -->
+
+                <div class="modal-galeria">
+                    <div class="modal-galeria-area" data-galeria-area>
+
+                        <img data-galeria-img src="" alt=""
+                            class="w-full h-full object-contain">
+
+                    </div>
+
+                    <button type="button" data-galeria-anterior aria-label="Foto anterior"
+                        class="modal-seta modal-seta-esquerda">&#8249;</button>
+
+                    <button type="button" data-galeria-proxima aria-label="Próxima foto"
+                        class="modal-seta modal-seta-direita">&#8250;</button>
+
+                    <span data-galeria-contador aria-live="polite"
+                        class="modal-contador"></span>
+                </div>
+
+                <!-- INFORMAÇÕES -->
+
+                <div class="modal-info">
+
+                    <h2 id="modal-titulo" data-modal-nome class="modal-nome"></h2>
+
+                    <p data-modal-preco class="modal-preco"></p>
+
+                    <p data-modal-estoque class="modal-estoque"></p>
+
+                    <div data-modal-descricao class="modal-descricao"></div>
+
+                    <dl class="modal-detalhes">
+                        <div>
+                            <dt>Código</dt>
+                            <dd data-modal-codigo></dd>
+                        </div>
+                        <div>
+                            <dt>Estoque</dt>
+                            <dd data-modal-estoque-valor></dd>
+                        </div>
+                    </dl>
+
+                    <form method="post" action="{% url 'carrinho:adicionar' 0 %}" data-modal-form
+                        class="modal-form">
+                        {% csrf_token %}
+                        <button type="submit" class="modal-comprar">
+                            Comprar agora
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         AREA DAS NOTIFICACOES
+         O JS cria e remove os avisos aqui dentro.
+    ====================================================== -->
+
+    <div id="notificacoes" class="notificacoes" aria-live="polite" aria-atomic="false"></div>
+
+
+    <script src="{% static 'js/motion.js' %}" defer></script>
+
+    <script src="{% static 'js/produto.js' %}" defer></script>
+
+    <script src="{% static 'js/ui.js' %}" defer></script>
+
+</body>
+
+</html>

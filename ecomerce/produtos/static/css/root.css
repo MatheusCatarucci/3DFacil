@@ -1,21 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&display=swap');
 
 /* ============================================================
-   FONTES
+   3DFácil — folha de estilo principal
+
+   Ordem do arquivo:
+     1. Tokens (variaveis)
+     2. Base
+     3. Tipografia
+     4. Header e navegacao
+     5. Botoes
+     6. Cards de produto
+     7. Expansao do card
+     8. Footer
+     9. Animacoes (keyframes)
+    10. Revelar ao rolar
+    11. Acessibilidade
+
+   Este arquivo nao usa @layer, entao tem prioridade sobre as
+   utilidades do Tailwind (que ficam dentro de @layer utilities).
+   Por isso da para estilizar os elementos existentes sem usar
+   !important nem mexer no HTML.
    ============================================================ */
 
-/*
-    Chakra Petch — robotic/futurista, só no título da header.
-    Tem pesos reais de 300 a 700, então font-bold / font-medium
-    do Tailwind funcionam de verdade (sem falso negrito).
 
-    Só pedimos 400 e 700 no @import acima para não baixar
-    arquivo de fonte que ninguém usa.
-*/
-.font-titulo {
-    font-family: 'Chakra Petch', sans-serif;
-}
+/* ============================================================
+   1. TOKENS
+   ============================================================ */
 
 :root {
     font-family: 'Montserrat', sans-serif;
@@ -66,15 +77,1054 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
 
+    /* Sombra da marca, com o roxo no lugar do preto. A versao -lg
+       e a que acende no hover dos botoes. */
+    --shadow-brand: 0 10px 30px -10px rgba(138, 5, 190, 0.45);
+    --shadow-brand-lg: 0 20px 45px -12px rgba(138, 5, 190, 0.6);
+
     /* ==============================
-       BORDAS
+       BORDAS ARREDONDADAS
     ============================== */
 
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+
+    /* ==============================
+       GRADIENTES
+    ============================== */
+
+    --gradient-brand: linear-gradient(135deg, #a21caf 0%, #8a05be 45%, #6d28d9 100%);
+
+    /* ==============================
+       MOVIMENTO
+    ============================== */
+
+    /* Curvas de aceleracao. expo da um atraso premium e entra
+       suave, out e o padrao das transicoes curtas e spring
+       serve para os "pulos" (badge do carrinho). */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    --duration-fast: 160ms;
+    --duration-base: 280ms;
+    --duration-slow: 550ms;
+
+    /* ==============================
+       CAMADAS
+    ============================== */
+
+    --z-header: 40;
+
+    --header-height: 68px;
+}
+
+
+/* ============================================================
+   2. BASE
+   ============================================================ */
+
+html {
+    scroll-behavior: smooth;
+    /* Compensa o header fixo ao pular para uma ancora. */
+    scroll-padding-top: calc(var(--header-height) + 16px);
 }
 
 body {
     font-family: 'Montserrat', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Barra de rolagem discreta, combinando com a paleta. */
+body::-webkit-scrollbar {
+    width: 11px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #ececef;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #c9c9d1;
+    border-radius: var(--radius-full);
+    border: 3px solid #ececef;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: var(--default-color);
+}
+
+/* ==============================
+   CURSOR
+   ============================== */
+
+/*
+    Tudo que da para apertar mostra a mao. Sem isso o navegador
+    fica com a seta em cima de botao, link e item de menu, e da
+    a impressao de que nada ali e clicavel.
+*/
+
+button,
+[type='button'],
+[type='submit'],
+[type='reset'],
+a,
+label,
+summary,
+select {
+    cursor: pointer;
+}
+
+/* O cursor de texto continua valendo no conteudo de verdade. */
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+textarea {
+    cursor: text;
+}
+
+::selection {
+    background-color: var(--default-color);
+    color: #fff;
+}
+
+
+/* ============================================================
+   3. TIPOGRAFIA
+   ============================================================ */
+
+.font-titulo {
+    font-family: 'Chakra Petch', sans-serif;
+}
+
+main h1,
+main h2 {
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+
+/* ============================================================
+   4. HEADER E NAVEGACAO
+   ============================================================ */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background-color: rgba(255, 255, 255, 0.82);
+    /* backdrop-filter da o efeito de vidro fosco atras do menu. */
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    backdrop-filter: blur(14px) saturate(180%);
+    border-bottom: 1px solid transparent;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+}
+
+header > div > a {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background-image: var(--gradient-brand);
+    /* 200% de largura para o gradiente ter onde deslizar no hover. */
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: background-position 0.7s var(--ease-expo),
+                filter var(--duration-fast) var(--ease-out);
+}
+
+header > div > a:hover {
+    background-position: 100% 50%;
+    filter: saturate(1.3) brightness(1.05);
+}
+
+/* ==============================
+   LINKS DO MENU
+   ============================== */
+
+/*
+    O :not() separa os links de texto do botao de carrinho, que
+    precisa manter o branco do Tailwind sobre o fundo roxo.
+
+    O filtro e pela classe rounded-full, que so o botao tem. Se
+    voce trocar o arredondamento do botao no template, troque
+    aqui tambem, senao a regra comeca a pegar o link errado.
+*/
+
+header nav a:not([class*='rounded-full']) {
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+header nav a:not([class*='rounded-full']):hover {
+    color: var(--default-color);
+}
+
+
+/* ============================================================
+   5. BOTOES
+   ============================================================ */
+
+/* Botao de comprar (dentro do card). */
+#produtos a {
+    font-weight: 600;
+    color: #fff;
+    background-image: var(--gradient-brand);
+    background-size: 160% 100%;
+    background-position: 0% 50%;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-brand);
+    transition: background-position 0.6s var(--ease-expo),
+                box-shadow var(--duration-base) var(--ease-out),
+                filter var(--duration-base) var(--ease-out);
+}
+
+/* O gradiente desliza e o brilho roxo do botao se intensifica. */
+#produtos a:hover {
+    background-position: 100% 50%;
+    box-shadow: var(--shadow-brand-lg);
+    filter: saturate(1.2) brightness(1.06);
+}
+
+/* Botao do carrinho, na header. */
+header nav a[class*='bg-gray-8'] {
+    background-image: var(--gradient-brand);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    box-shadow: var(--shadow-brand);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                filter var(--duration-base) var(--ease-out);
+}
+
+header nav a[class*='bg-gray-8']:hover {
+    box-shadow: var(--shadow-brand-lg);
+    filter: saturate(1.2) brightness(1.08);
+}
+
+
+/* ============================================================
+   6. CARDS DE PRODUTO
+   ============================================================ */
+
+/*
+    O card ganha borda roxa, um brilho roxo suave e sobe 4px.
+    Nenhuma barra aparece aqui: o antigo ::before que crescia no
+    topo do card foi removido de proposito.
+*/
+
+#produtos > div {
+    position: relative;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--duration-base) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-out);
+}
+
+#produtos > div:hover {
+    border-color: var(--default-color);
+    box-shadow: 0 18px 38px -20px rgba(138, 5, 190, 0.55);
+    transform: translateY(-4px);
+}
+
+/* ==============================
+   IMAGEM DO CARD
+   ============================== */
+
+/*
+    Sem zoom no hover. A imagem mantem object-cover e acompanha
+    o tamanho do card, sem transform.
+*/
+
+/* ==============================
+   TEXTO DO CARD
+   ============================== */
+
+#produtos h2 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+#produtos > div:hover h2 {
+    color: var(--default-color);
+}
+
+#produtos .text-gray-500 {
+    color: var(--text-muted);
+}
+
+#produtos .text-green-600 {
+    background-image: linear-gradient(135deg, #16a34a, #0d9488);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+/* Mensagem de lista vazia. */
+#produtos > p {
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-xl);
+    color: var(--text-muted);
+}
+
+
+/* ============================================================
+   7. MODAL DO PRODUTO (TELA CHEIA)
+   ============================================================ */
+
+/*
+    O modal ocupa quase a tela inteira. O fundo usa backdrop-filter
+    para desfocar o conteudo de tras e um preto semitransparente
+    por cima, deixando o painel em evidencia.
+*/
+
+.modal-produto {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-produto[hidden] {
+    display: none;
+}
+
+.modal-fundo {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(9, 9, 11, 0.72);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.modal-aberto .modal-fundo {
+    opacity: 1;
+}
+
+/* O painel sobe um pouco ao abrir. */
+.modal-painel {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1080px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background-color: var(--surface-color);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+    transition: opacity var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-expo);
+}
+
+.modal-aberto .modal-painel {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* ==============================
+   BOTAO FECHAR
+   ============================== */
+
+.modal-fechar {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 20;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background-color: #dc2626;
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring);
+}
+
+.modal-fechar:hover {
+    background-color: #b91c1c;
+    transform: rotate(90deg);
+}
+
+/* ==============================
+   GRADE: GALERIA + INFORMACOES
+   ============================== */
+
+.modal-grade {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+}
+
+@media (min-width: 900px) {
+    .modal-grade {
+        grid-template-columns: 1.15fr 1fr;
+    }
+}
+
+/* ==============================
+   GALERIA
+   ============================== */
+
+.modal-galeria {
+    position: relative;
+    background-color: #18181b;
+}
+
+/* Proporcao 4:3 no celular, quadrada no desktop. */
+.modal-galeria-area {
+    aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 900px) {
+    .modal-galeria-area {
+        aspect-ratio: 1 / 1;
+    }
+}
+
+.modal-galeria-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-seta {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.modal-seta:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.modal-seta-esquerda {
+    left: 0.75rem;
+}
+
+.modal-seta-direita {
+    right: 0.75rem;
+}
+
+.modal-contador {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==============================
+   INFORMACOES
+   ============================== */
+
+.modal-info {
+    padding: 1.75rem;
+}
+
+.modal-nome {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-color);
+    padding-right: 2.5rem;
+}
+
+.modal-preco {
+    margin-top: 0.5rem;
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    background-image: linear-gradient(135deg, #16a34a, #0d9488);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.modal-estoque {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+    background-color: var(--default-color-light);
+    color: var(--default-color-active);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.modal-descricao {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.modal-detalhes {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.8rem;
+}
+
+.modal-detalhes dt {
+    color: var(--text-muted);
+}
+
+.modal-detalhes dd {
+    margin-top: 0.15rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.modal-comprar {
+    display: block;
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.8rem;
+    border-radius: var(--radius-md);
+    background-image: var(--gradient-brand);
+    color: #fff;
+    font-weight: 600;
+    transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.modal-comprar:hover {
+    box-shadow: var(--shadow-brand-lg);
+}
+
+/* ==============================
+   CARD
+   ============================== */
+
+.produto-card > button[data-abrir-modal] {
+    transition: transform var(--duration-base) var(--ease-out);
+}
+
+
+
+/* ============================================================
+   8. FOOTER
+   ============================================================ */
+
+footer {
+    position: relative;
+    background-image: linear-gradient(180deg, #27272a 0%, #18181b 100%);
+    color: #a1a1aa;
+    overflow: hidden;
+}
+
+/* Brilho roxo bem discreto no canto superior direito. */
+footer::before {
+    content: '';
+    position: absolute;
+    top: -140px;
+    right: -100px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(138, 5, 190, 0.32), transparent 68%);
+    pointer-events: none;
+}
+
+footer h3 {
+    font-family: 'Chakra Petch', sans-serif;
+    color: #fff;
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+footer h3:hover {
+    color: #d8b4fe;
+}
+
+footer a {
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+footer a:hover {
+    color: #fff;
+}
+
+footer .border-t {
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #71717a;
+}
+
+
+/* ============================================================
+   9. ANIMACOES (keyframes)
+   ============================================================ */
+
+@keyframes surgir-cima {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes surgir-esquerda {
+    from {
+        opacity: 0;
+        transform: translateX(-24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes surgir-direita {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Entrada do header descendo de leve. */
+header {
+    animation: surgir-cima 0.6s var(--ease-expo) both;
+}
+
+@keyframes pulsar-suave {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.55;
+        transform: scale(0.94);
+    }
+}
+
+
+/* ============================================================
+   10. REVELAR AO ROLAR
+   ============================================================ */
+
+/*
+    A classe .reveal e aplicada pelo motion.js nos elementos
+    selecionados. O observer troca por .is-visible quando o
+    elemento entra na tela.
+
+    Repare no .motion-ready: o conteudo so fica invisivel quando o
+    JS realmente rodou. Se o motion.js falhar ou for bloqueado,
+    a regra nunca casa e o site aparece normal, sem conteudo
+    sumido. Esse detalhe evita a pagina quebrar em branco.
+*/
+
+.motion-ready .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s var(--ease-expo),
+                transform 0.8s var(--ease-expo);
+    will-change: opacity, transform;
+}
+
+.motion-ready .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   11. ACESSIBILIDADE
+   ============================================================ */
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--default-color);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+}
+
+/* Quem prefere menos movimento ve tudo estatico. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+
+    .motion-ready .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+
+/* ============================================================
+   12. INTERACOES E MENU
+   ============================================================ */
+
+/* ==============================
+   MENU MOBILE
+   ============================== */
+
+/*
+    No desktop a nav fica sempre visivel e o botao some (lg:hidden).
+    No celular a nav vira um painel que desliza para baixo.
+*/
+
+.menu-botao {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0 0.6rem;
+    border-radius: var(--radius-md);
+    transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+/*
+    No desktop (1024px, o mesmo ponto do lg do Tailwind) o botao
+    some, porque ali a nav ja aparece inteira.
+
+    Esta regra precisa ficar AQUI e nao como a classe lg:hidden no
+    HTML. Este arquivo nao usa @layer, e em CSS declaracao sem
+    camada sempre ganha de declaracao com camada, nao importa a
+    especificidade. Entao o display:flex acima venceria o
+    display:none do utilitario lg:hidden, e o botao apareceria
+    no meio da header no computador.
+*/
+
+@media (min-width: 1024px) {
+    .menu-botao {
+        display: none;
+    }
+}
+
+.menu-botao:hover {
+    background-color: var(--surface-hover);
+}
+
+.menu-barra {
+    display: block;
+    height: 2px;
+    width: 100%;
+    border-radius: var(--radius-full);
+    background-color: var(--text-color);
+    transform-origin: center;
+    transition: transform var(--duration-base) var(--ease-expo),
+                opacity var(--duration-fast) var(--ease-out);
+}
+
+/* As tres barras viram um X. */
+.menu-botao[aria-expanded='true'] .menu-barra:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-botao[aria-expanded='true'] .menu-barra:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0.2);
+}
+
+.menu-botao[aria-expanded='true'] .menu-barra:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.menu-mobile {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s var(--ease-expo),
+                opacity var(--duration-base) var(--ease-out);
+}
+
+.menu-mobile.aberto {
+    max-height: 22rem;
+    opacity: 1;
+}
+
+/* Os links entram um a um. O --i e o indice, definido no HTML. */
+.menu-mobile a {
+    display: block;
+    padding: 0.7rem 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.35s var(--ease-out),
+                transform 0.35s var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                padding-left var(--duration-base) var(--ease-out);
+}
+
+.menu-mobile.aberto a {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.menu-mobile.aberto a:nth-child(1) { transition-delay: 0.06s; }
+.menu-mobile.aberto a:nth-child(2) { transition-delay: 0.11s; }
+.menu-mobile.aberto a:nth-child(3) { transition-delay: 0.16s; }
+.menu-mobile.aberto a:nth-child(4) { transition-delay: 0.21s; }
+
+.menu-mobile a:hover {
+    color: var(--default-color);
+    padding-left: 0.6rem;
+}
+
+
+/* ==============================
+   ESTADO ENVIANDO (formularios)
+   ============================== */
+
+/*
+    Enquanto o POST vai para o servidor, o botao fica apagado e
+    ganha um giro. Evita o clique duplo e mostra que algo houve.
+*/
+
+.enviando {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.girando {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    margin-right: 0.5em;
+    vertical-align: -0.1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==============================
+   BADGE DO CARRINHO
+   ============================== */
+
+/*
+    Da um pulo quando a pagina carrega com itens no carrinho:
+    o olho vai direto para o icone.
+*/
+
+.carrinho-badge {
+    animation: pulsar-badge 0.6s var(--ease-spring) both;
+}
+
+@keyframes pulsar-badge {
+    0% {
+        transform: scale(0.4);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.18);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==============================
+   ITENS DO CARRINHO
+   ============================== */
+
+/* Entrada suave de cada item da lista. */
+.carrinho-item {
+    animation: surgir-cima 0.5s var(--ease-expo) both;
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-out);
+}
+
+.carrinho-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+
+/* ==============================
+   NOTIFICACOES (TOAST)
+   ============================== */
+
+.notificacoes {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.notificacao {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 22rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: #18181b;
+    color: #fff;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    box-shadow: 0 16px 40px -14px rgba(0, 0, 0, 0.55);
+
+    /* pointer-events volta aqui porque o container e none e os
+       avisos ainda precisam ser clicaveis para fechar. */
+    pointer-events: auto;
+
+    /* Estado inicial: fora da tela, um pouco menor e apagado. */
+    opacity: 0;
+    transform: translateX(32px) scale(0.94);
+    transition: opacity 0.4s var(--ease-out),
+                transform 0.45s var(--ease-expo);
+}
+
+.notificacao.entrando {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+/* Sai pelo mesmo caminho, um pouco mais rapido. */
+.notificacao.saindo {
+    opacity: 0;
+    transform: translateX(32px) scale(0.94);
+    transition: opacity 0.28s var(--ease-out),
+                transform 0.28s var(--ease-out);
+}
+
+.notificacao-sucesso {
+    background-color: #14532d;
+}
+
+.notificacao-erro {
+    background-color: #991b1b;
+}
+
+.notificacao-icone {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.18);
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.notificacao-fechar {
+    flex-shrink: 0;
+    margin-left: 0.25rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    line-height: 1;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.notificacao-fechar:hover {
+    color: #fff;
+}
+
+/* No celular fica no rodape, ocupando a largura util. */
+@media (max-width: 640px) {
+    .notificacoes {
+        left: 1rem;
+        right: 1rem;
+        align-items: stretch;
+    }
+
+    .notificacao {
+        max-width: none;
+    }
+}
+
+
+/* ============================================================
+   IMPRESSÃO
+   ============================================================ */
+
+@media print {
+    header,
+    footer {
+        display: none;
+    }
 }
