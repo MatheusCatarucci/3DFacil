@@ -1,0 +1,6 @@
+fastapi[standard]
+jinja2
+python-multipart
+itsdangerous
+python-dotenv
+bcrypt
