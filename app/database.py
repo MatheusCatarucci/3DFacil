@@ -5,7 +5,7 @@ from pathlib import Path
 from app import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SCHEMA_PATH = BASE_DIR / "sql" / "schema.sql"
+SCHEMA_PATH = BASE_DIR / "scripts" / "schema.sql"
 
 
 def get_connection() -> sqlite3.Connection:
