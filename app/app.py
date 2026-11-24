@@ -8,14 +8,31 @@ import socket
 import subprocess
 from pathlib import Path
 
+# Bibliotecas de terceiros
+import bcrypt
+from pydantic import BaseModel
+
 # Bibliotecas do FastAPI
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 # Middleware para gerenciamento de sessões
 from starlette.middleware.sessions import SessionMiddleware
+
+# Módulos próprios da aplicação
+from model import buscar_usuario_por_email
+
+
+# ============================================================
+# MODELOS
+# ============================================================
+
+# Modelos base de dados de entrada (Pydantic).
+class Usuario(BaseModel):
+    email: str
+    senha: str
 
 
 # ============================================================
@@ -85,17 +102,44 @@ async def home(request: Request):
         "ambiente": APP_ENV,
     }
 
-    # Renderiza o arquivo home.html com os dados do contexto.
+    # Renderiza o arquivo login.html com os dados do contexto.
     return templates.TemplateResponse(
         request,
-        "home.html",
+        "login.html",
         contexto
     )
+
+
+@app.get("/buscar_usuario")
+async def buscar_usuario(request: Request, usuario_form: Usuario):
+    email = usuario_form.email
+    senha = usuario_form.senha
+
+    usuario_banco = buscar_usuario_por_email(email)
+
+    if not usuario_banco:
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    request.session["usuario_id"] = usuario_banco["id"]
+
+    if senha == usuario_banco.senha:
+        return Response(status_code=status.HTTP_200_OK)
 
 
 # ============================================================
 # 7. FUNÇÕES AUXILIARES
 # ============================================================
+
+
+def gerar_hash(senha_original):
+    """Gera um hash bcrypt a partir de uma senha em texto plano."""
+    senha_bytes = senha_original.encode("utf-8")
+    salt = bcrypt.gensalt()
+    senha_hash = bcrypt.hashpw(senha_bytes, salt)
+
+    # Senha convertida para hash
+    return senha_hash.decode("utf-8")
+
 
 def obter_ip_local():
     """
