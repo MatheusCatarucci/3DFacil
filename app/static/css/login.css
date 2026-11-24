@@ -1,0 +1,307 @@
+.bg-grid {
+    background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+.scene {
+    filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.25));
+}
+
+/* ---- Animação da impressora (ciclo de 10s, só CSS) ---- */
+.layer {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-out;
+}
+
+.l1 {
+    animation-name: l1;
+}
+
+.l2 {
+    animation-name: l2;
+}
+
+.l3 {
+    animation-name: l3;
+}
+
+.l4 {
+    animation-name: l4;
+}
+
+.l5 {
+    animation-name: l5;
+}
+
+.l6 {
+    animation-name: l6;
+}
+
+.l7 {
+    animation-name: l7;
+}
+
+.l8 {
+    animation-name: l8;
+}
+
+@keyframes l1 {
+
+    0%,
+    4% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    7%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l2 {
+
+    0%,
+    12% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    15%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l3 {
+
+    0%,
+    20% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    23%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l4 {
+
+    0%,
+    28% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    31%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l5 {
+
+    0%,
+    36% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    39%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l6 {
+
+    0%,
+    44% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    47%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l7 {
+
+    0%,
+    52% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    55%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+@keyframes l8 {
+
+    0%,
+    60% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+
+    63%,
+    90% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: scaleX(.6);
+    }
+}
+
+/* O eixo e o bico sobem uma camada (14px) a cada novo anel */
+#nozzle {
+    animation: nozzle 10s linear infinite;
+}
+
+@keyframes nozzle {
+
+    0%,
+    11.9% {
+        transform: translateY(0);
+    }
+
+    12%,
+    19.9% {
+        transform: translateY(-14px);
+    }
+
+    20%,
+    27.9% {
+        transform: translateY(-28px);
+    }
+
+    28%,
+    35.9% {
+        transform: translateY(-42px);
+    }
+
+    36%,
+    43.9% {
+        transform: translateY(-56px);
+    }
+
+    44%,
+    51.9% {
+        transform: translateY(-70px);
+    }
+
+    52%,
+    59.9% {
+        transform: translateY(-84px);
+    }
+
+    60%,
+    90% {
+        transform: translateY(-98px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Vai e vem do bico */
+.sweep {
+    animation: sweep 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes sweep {
+    from {
+        transform: translateX(-52px);
+    }
+
+    to {
+        transform: translateX(52px);
+    }
+}
+
+/* Quem prefere menos movimento vê a peça pronta e parada */
+@media (prefers-reduced-motion: reduce) {
+    .layer {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    #nozzle {
+        animation: none;
+        transform: translateY(-98px);
+    }
+
+    .sweep {
+        animation: none;
+    }
+}
