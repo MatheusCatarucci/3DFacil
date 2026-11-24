@@ -158,11 +158,12 @@
                     </div>
                     {% endif %}
 
-                    <form method="post" action="/login" class="mt-5 space-y-4">
+                    <form method="post" id="form-login" class="mt-5 space-y-4">
 
                         <!-- E-mail -->
                         <div>
-                            <label for="email" class="mb-1.5 block text-sm font-medium text-slate-300">E-mail</label>
+                            <label for="email" class="mb-1.5 block text-sm font-medium text-slate-300"
+                                id="email-login">E-mail</label>
                             <div class="relative">
                                 <svg viewBox="0 0 24 24"
                                     class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
@@ -179,7 +180,8 @@
 
                         <!-- Senha -->
                         <div>
-                            <label for="senha" class="mb-1.5 block text-sm font-medium text-slate-300">Senha</label>
+                            <label for="senha" class="mb-1.5 block text-sm font-medium text-slate-300"
+                                id="senha-login">Senha</label>
                             <div class="relative">
                                 <svg viewBox="0 0 24 24"
                                     class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
@@ -214,7 +216,7 @@
                         </div>
 
                         <!-- Botão -->
-                        <button type="submit"
+                        <button type="submit" id="btn-login"
                             class="group flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition hover:from-violet-500 hover:to-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
                             Entrar
                             <svg viewBox="0 0 24 24" class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
@@ -232,6 +234,23 @@
         </main>
     </div>
 
+    <div id="notificacao" class="notificacao">
+        <div class="notificacao-icone">
+            <i class="bi bi-exclamation-circle"></i>
+        </div>
+
+        <div class="notificacao-conteudo">
+            <strong id="notificacao-titulo">Erro na autenticação</strong>
+            <span id="notificacao-mensagem">
+                E-mail ou senha incorretos.
+            </span>
+        </div>
+
+        <button id="fechar-notificacao" type="button">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+
     <!-- Único script: mostrar/ocultar senha -->
     <script>
         var campo = document.getElementById('senha');
@@ -243,6 +262,9 @@
             botao.setAttribute('aria-label', mostrando ? 'Mostrar senha' : 'Ocultar senha');
         });
     </script>
+
+    <script src="{{ url_for('static', path='js/authenticator.js') }}"></script>
+
 </body>
 
 </html>
