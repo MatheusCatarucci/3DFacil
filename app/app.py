@@ -7,6 +7,7 @@ import os
 import socket
 import subprocess
 from pathlib import Path
+from fastapi import Query
 
 # Bibliotecas de terceiros
 import bcrypt
@@ -17,6 +18,7 @@ from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 
 # Middleware para gerenciamento de sessões
 from starlette.middleware.sessions import SessionMiddleware
@@ -110,20 +112,96 @@ async def home(request: Request):
     )
 
 
-@app.get("/buscar_usuario")
-async def buscar_usuario(request: Request, usuario_form: Usuario):
+@app.post("/login")
+async def login(request: Request, usuario_form: Usuario):
     email = usuario_form.email
     senha = usuario_form.senha
+    
 
     usuario_banco = buscar_usuario_por_email(email)
 
-    if not usuario_banco:
+    if usuario_banco is None:
         return Response(status_code=status.HTTP_401_UNAUTHORIZED)
 
+    senha_bytes = senha.encode("utf-8")
+    hash_bytes = usuario_banco["password_hash"].encode("utf-8")
+    
+    senha_final = bcrypt.checkpw(senha_bytes, hash_bytes)
+    
+    #DEBUG    
+    if not senha_final:
+        print(f"Usuário encontrado: {email}")
+        print(f"Senha válida: {senha_final}")
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        
+    
     request.session["usuario_id"] = usuario_banco["id"]
+    request.session["usuario_nome"] = usuario_banco["name"]
 
-    if senha == usuario_banco.senha:
-        return Response(status_code=status.HTTP_200_OK)
+    return Response(status_code=status.HTTP_200_OK)
+    
+    
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    verificarSessao(request)
+    
+    if not verificarSessao(request):
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_302_FOUND
+        )
+    
+    contexto = {
+        "nome": "Matheus",
+        "idade": 18
+    }
+    return templates.TemplateResponse(
+        request=request,
+        name="dashboard.html",
+        context= contexto
+    )
+
+
+@app.get("/gerenciar")
+async def gerenciar(request: Request):
+    verificarSessao(request)
+
+    if not verificarSessao(request):
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_302_FOUND
+        )
+
+    contexto = {
+        "nome": "Matheus",
+        "idade": 18
+    }
+    return templates.TemplateResponse(
+        request=request,
+        name="gerenciar.html",
+        context= contexto
+    )
+
+
+@app.get("/session")
+async def verificarSessao(request: Request):
+    if request.session.get("usuario_nome") is None:
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+    
+    return Response(status_code=status.HTTP_200_OK)
+    
+    
+#ROTAS DE DEBUG
+@app.get("/usuario_banco")
+async def buscarUsuario(email: str = Query(...)):
+    usuario = buscar_usuario_por_email(email)
+    
+    return {
+        "id":usuario["id"],
+        "nome":usuario["name"],
+        "email":usuario["email"],
+        "senha_hash":usuario["password_hash"]
+    }
 
 
 # ============================================================
