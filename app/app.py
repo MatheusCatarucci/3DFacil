@@ -1,35 +1,170 @@
+# ============================================================
+# 1. IMPORTAÇÕES NECESSÁRIAS
+# ============================================================
+
+# Bibliotecas nativas do Python
+import os
+import socket
+import subprocess
 from pathlib import Path
+
+# Bibliotecas do FastAPI
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+# Middleware para gerenciamento de sessões
 from starlette.middleware.sessions import SessionMiddleware
-from config import APP_ENV, SECRET_KEY
-import templates
 
 
+# ============================================================
+# 2. CONFIGURAÇÕES DA APLICAÇÃO
+# ============================================================
+
+# Define o ambiente da aplicação.
+# Caso a variável APP_ENV não exista, utiliza "development".
+APP_ENV = os.getenv("APP_ENV", "development")
+
+# Chave utilizada para assinar os dados das sessões.
+# Deve ser definida através de uma variável de ambiente.
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+
+# Obtém o diretório onde este arquivo está localizado.
 APP_DIR = Path(__file__).resolve().parent
 
+# Configura o diretório de templates HTML da aplicação.
 templates = Jinja2Templates(directory=APP_DIR / "templates")
 
-APP_DIR = Path(__file__).resolve().parent
 
+# ============================================================
+# 3. INICIALIZAÇÃO DA APLICAÇÃO FASTAPI
+# ============================================================
+
+# Cria a instância principal da API.
 app = FastAPI(title="3D Fáil API")
 
+
+# ============================================================
+# 4. MIDDLEWARES
+# ============================================================
+
+# Configura o gerenciamento de sessões dos usuários.
 app.add_middleware(
     SessionMiddleware,
     secret_key=SECRET_KEY,
     same_site="lax",
     https_only=False,
-    max_age=60 * 60 * 8,
+    max_age=60 * 60 * 8,  # Duração da sessão: 8 horas.
 )
 
-app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
+
+# ============================================================
+# 5. ARQUIVOS ESTÁTICOS
+# ============================================================
+
+# Disponibiliza arquivos CSS, JavaScript e imagens.
+# Esses arquivos poderão ser acessados pela rota /static.
+app.mount(
+    "/static",
+    StaticFiles(directory=APP_DIR / "static"),
+    name="static"
+)
 
 
+# ============================================================
+# 6. ROTAS DA APLICAÇÃO
+# ============================================================
+
+# Rota principal: página inicial do sistema.
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+
+    # Dados enviados para o template HTML.
     contexto = {
         "ambiente": APP_ENV,
     }
-    return templates.TemplateResponse(request, "home.html", contexto)
+
+    # Renderiza o arquivo home.html com os dados do contexto.
+    return templates.TemplateResponse(
+        request,
+        "home.html",
+        contexto
+    )
+
+
+# ============================================================
+# 7. FUNÇÕES AUXILIARES
+# ============================================================
+
+def obter_ip_local():
+    """
+    Identifica o endereço IP local da máquina.
+
+    Utiliza um socket UDP para identificar qual interface
+    de rede seria utilizada para alcançar um endereço externo.
+    Não envia dados para esse endereço.
+    """
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
+
+    except OSError:
+        return "Não foi possível identificar o IP"
+
+
+# ============================================================
+# 8. INICIALIZAÇÃO DO SERVIDOR
+# ============================================================
+
+# Executa este bloco somente quando o arquivo for iniciado
+# diretamente, evitando iniciar outro servidor em importações.
+if __name__ == "__main__":
+
+    # Identifica o IP local da máquina.
+    ip = obter_ip_local()
+
+    # Exibe as informações de acesso ao sistema.
+    print("\n" + "=" * 45)
+    print("       SERVIDOR 3D FÁCIL")
+    print("=" * 45)
+    print(f" Local:  http://localhost:8000")
+    print(f" Rede:   http://{ip}:8000")
+    print("=" * 45 + "\n", flush=True)
+
+    # Tenta iniciar o servidor Uvicorn.
+    try:
+        subprocess.run(
+            [
+                "uvicorn",
+                "app:app",
+                "--host", "0.0.0.0",
+                "--port", "8000"
+            ],
+            cwd=APP_DIR,
+            check=True
+        )
+
+    # Erro quando o executável Uvicorn não é encontrado.
+    except FileNotFoundError:
+        print("[ERRO] Uvicorn não encontrado.")
+        print("Verifique se está instalado no ambiente virtual:")
+        print("pip install uvicorn")
+
+    # Erro quando o processo Uvicorn termina com código diferente de zero.
+    except subprocess.CalledProcessError as erro:
+        print("\n[ERRO] O servidor Uvicorn encerrou com falha.")
+        print(f"Código de saída: {erro.returncode}")
+        print("Verifique as mensagens acima para identificar a causa.")
+
+    # Permite encerrar o servidor utilizando CTRL + C.
+    except KeyboardInterrupt:
+        print("\n[INFO] Servidor encerrado pelo usuário.")
+
+    # Captura outros erros inesperados.
+    except Exception as erro:
+        print(
+            f"\n[ERRO INESPERADO] "
+            f"{type(erro).__name__}: {erro}"
+        )
