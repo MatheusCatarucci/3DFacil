@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar · 3D Fácil</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+
+    <style>
+        /* ===== BARRA DE ROLAGEM PERSONALIZADA ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+            border: 2px solid #0f172a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.5); }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .animate-slide-left {
+            animation: slideInLeft 0.5s ease-out forwards;
+        }
+        .animate-slide-right {
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 3s infinite;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-slide-down {
+            animation: slideDown 0.4s ease-out forwards;
+        }
+
+        .opacity-0 {
+            opacity: 0;
+        }
+
+        /* ===== GLASSMORPHISM ===== */
+        .glass {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-hover:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.7));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* ===== GRADIENTES ===== */
+        .bg-gradient-violet {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+        }
+        .bg-gradient-mesh {
+            background: radial-gradient(circle at top left, rgba(139, 92, 246, 0.15), transparent 40%),
+                        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.15), transparent 40%);
+        }
+
+        /* ===== UTILITÁRIOS ===== */
+        .text-balance {
+            text-wrap: balance;
+        }
+
+        /* Tab underline animation */
+        .tab-underline {
+            position: absolute;
+            bottom: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            border-radius: 2px 2px 0 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+
+<body class="min-h-dvh bg-slate-950 text-slate-100 antialiased selection:bg-violet-500/30 selection:text-white">
+
+    <!-- ======================= SIDEBAR ======================= -->
+    <aside
+        id="sidebar"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900/90 border-r border-slate-800/50 transform -translate-x-full lg:translate-x-0 transition-transform duration-500 ease-in-out flex flex-col glass">
+        <div class="flex items-center justify-between h-20 px-6 border-b border-slate-800/50 shrink-0 glass-hover animate-slide-left">
+            <div class="flex items-center gap-3">
+                <div class="relative group">
+                    <span
+                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-violet text-white shadow-xl shadow-violet-600/30 animate-float transition-all group-hover:scale-110">
+                        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                            <path d="m3.3 7 8.7 5 8.7-5" />
+                            <path d="M12 22V12" />
+                        </svg>
+                    </span>
+                    <div class="absolute -inset-1 bg-gradient-violet rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-white">3D<span class="text-violet-400">Fácil</span></span>
+            </div>
+            <button id="fecharSidebar"
+                class="lg:hidden p-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all duration-300 glass-hover">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="flex-1 py-5 space-y-1 px-3 overflow-y-auto">
+            <a href="/dashboard"
+                class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.1s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/gerenciar"
+                class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold bg-violet-600/20 text-violet-300 shadow-xl shadow-violet-900/30 border border-violet-500/20 animate-fade-in" style="animation-delay: 0.2s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                <span>Gerenciar</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.3s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span>Clientes</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.4s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <span>Produtos</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.5s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 8.068 9.246 9.14 8 10v4a2 2 0 002 2h4a2 2 0 002-2V6.253" />
+                </svg>
+                <span>Pedidos</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.6s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Produção</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.7s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Financeiro</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent hover:border-slate-700 transition-all duration-300 animate-fade-in" style="animation-delay: 0.8s">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4V7" />
+                </svg>
+                <span>Tarefas</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Overlay mobile -->
+    <div id="overlay"
+        class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-500 ease-in-out"
+        onclick="toggleSidebar()"></div>
+
+    <!-- ======================= CONTEÚDO PRINCIPAL ======================= -->
+    <main class="flex-1 pl-0 lg:pl-64 pt-16 pb-10 px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-in-out"
+        id="mainContent">
+
+        <!-- Header -->
+        <header class="mb-8 relative animate-fade-in">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <p class="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-1 animate-pulse-glow">
+                        Gerenciador da empresa
+                    </p>
+                    <h1 class="text-3xl font-bold text-white text-balance">Inserir dados da empresa</h1>
+                    <p class="mt-2 text-slate-400 text-sm">
+                        Cadastre clientes, produtos, pedidos, produção, financeiro e tarefas.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex flex-col items-end">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Módulo</p>
+                        <p class="text-sm font-bold text-white">Inserção de dados</p>
+                    </div>
+                    <div class="flex items-center gap-2 rounded-xl border border-slate-800/50 bg-slate-900/80 backdrop-blur px-3 py-1.5 text-xs text-slate-300 shadow-xl">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Modo edição ativo</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Abas -->
+        <div class="relative mb-8 animate-fade-in">
+            <div class="overflow-x-auto border-b border-slate-800/50 pb-2">
+                <div class="inline-flex min-w-full relative">
+                    <!-- Indicador de aba ativa (slide) -->
+                    <div id="tabIndicator" class="tab-underline w-20 left-0"></div>
+
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="empresa">
+                        Empresa
+                    </button>
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="clientes">
+                        Clientes
+                    </button>
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="produtos">
+                        Produtos
+                    </button>
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="pedidos">
+                        Pedidos / Orçamentos
+                    </button>
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="producao">
+                        Produção
+                    </button>
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="financeiro">
+                        Financeiro
+                    </button>
+                    <button class="tab-btn relative px-6 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-t-xl z-10 transition-all duration-300" data-tab="tarefas">
+                        Tarefas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conteúdo das abas -->
+            <div class="space-y-6">
+
+                <!-- ABA: EMPRESA -->
+                <section id="tab-empresa" class="tab-content">
+                    <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-8 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                        <h2 class="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
+                            <svg class="h-5 w-5 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-7m-7 0h3m4 0h3m-7 0V9a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6" />
+                            </svg>
+                            Dados da empresa
+                        </h2>
+                        <form id="form-empresa" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Nome fantasia</label>
+                                <input type="text" name="nome_fantasia" placeholder="Ex: 3D Print Express"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">CNPJ / CPF</label>
+                                <input type="text" name="documento" placeholder="00.000.000/0000-00"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Telefone</label>
+                                <input type="tel" name="telefone" placeholder="(11) 99999-9999"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">E-mail</label>
+                                <input type="email" name="email" placeholder="contato@empresa.com"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Endereço</label>
+                                <input type="text" name="endereco" placeholder="Rua das Impressoras, 123"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                            </div>
+                            <div class="md:col-span-2 lg:col-span-1">
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Cidade</label>
+                                <input type="text" name="cidade" placeholder="São Paulo"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-3 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                            </div>
+                            <button type="submit"
+                                class="col-span-2 md:col-span-1 lg:col-span-1 flex items-center justify-center gap-2.5 rounded-xl bg-gradient-violet px-6 py-3 text-sm font-bold text-white shadow-xl shadow-violet-600/30 transition-all duration-300 hover:shadow-violet-600/50 hover:-translate-y-1 active:scale-95">
+                                Salvar empresa
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- ABA: CLIENTES -->
+                <section id="tab-clientes" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="lg:w-1/2">
+                            <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                                <h2 class="text-lg font-bold text-slate-200 mb-5">Novo cliente</h2>
+                                <form id="form-clientes" class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Nome completo</label>
+                                            <input type="text" name="nome" placeholder="João Silva"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">E-mail</label>
+                                            <input type="email" name="email" placeholder="joao@email.com"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Telefone / WhatsApp</label>
+                                        <input type="tel" name="telefone" placeholder="(11) 99999-9999"
+                                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Cidade</label>
+                                        <input type="text" name="cidade" placeholder="São Paulo"
+                                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Origem</label>
+                                            <select name="origem"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                                <option value="instagram">Instagram</option>
+                                                <option value="whatsapp">WhatsApp</option>
+                                                <option value="site">Site</option>
+                                                <option value="indicacao">Indicação</option>
+                                                <option value="anuncio_pago">Anúncio pago</option>
+                                                <option value="outro">Outro</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Status</label>
+                                            <select name="status"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                                <option value="lead">Lead</option>
+                                                <option value="cliente">Cliente</option>
+                                                <option value="inativo">Inativo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full flex items-center justify-center gap-2.5 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-violet-600/20 transition-all duration-300 hover:bg-violet-500 hover:-translate-y-1 active:scale-95">
+                                        Cadastrar cliente
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="lg:w-1/2 flex-1">
+                            <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                                <h2 class="text-lg font-bold text-slate-200 mb-4">Clientes cadastrados</h2>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead class="text-slate-500">
+                                            <tr class="border-b border-slate-800/50">
+                                                <th class="pb-3 font-medium text-left">Cliente</th>
+                                                <th class="pb-3 font-medium text-left">E-mail</th>
+                                                <th class="pb-3 font-medium text-left">Cidade</th>
+                                                <th class="pb-3 font-medium text-left">Origem</th>
+                                                <th class="pb-3 font-medium text-left">Status</th>
+                                                <th class="pb-3 font-medium text-right">Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-clientes" class="divide-y divide-slate-800/50">
+                                            <!-- Linhas inseridas via JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p id="vazio-clientes" class="mt-4 text-xs text-slate-500 text-center">Nenhum cliente cadastrado ainda.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ABA: PRODUTOS -->
+                <section id="tab-produtos" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="lg:w-1/2">
+                            <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                                <h2 class="text-lg font-bold text-slate-200 mb-5">Novo produto</h2>
+                                <form id="form-produtos" class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Nome do produto</label>
+                                        <input type="text" name="nome" placeholder="Suporte para fone de ouvido"
+                                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">SKU</label>
+                                            <input type="text" name="sku" placeholder="SUP-FONE-001"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Categoria</label>
+                                            <select name="categoria"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                                <option value="acessorios">Acessórios</option>
+                                                <option value="brinquedos">Brinquedos</option>
+                                                <option value="pecas">Peças</option>
+                                                <option value="outro">Outro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Tipo</label>
+                                        <select name="tipo"
+                                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                            <option value="catalogo">Catálogo</option>
+                                            <option value="personalizado">Personalizado</option>
+                                        </select>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Peso (g)</label>
+                                            <input type="number" name="peso" placeholder="25"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Tempo (min)</label>
+                                            <input type="number" name="tempo" placeholder="180"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Custo (R$)</label>
+                                            <input type="number" name="custo" step="0.01" placeholder="12,50"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Preço (R$)</label>
+                                            <input type="number" name="preco" step="0.01" placeholder="35,00"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Estoque</label>
+                                            <input type="number" name="estoque" placeholder="10"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Status</label>
+                                            <select name="status"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                                <option value="ativo">Ativo</option>
+                                                <option value="inativo">Inativo</option>
+                                                <option value="rascunho">Rascunho</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full flex items-center justify-center gap-2.5 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-violet-600/20 transition-all duration-300 hover:bg-violet-500 hover:-translate-y-1 active:scale-95">
+                                        Cadastrar produto
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="lg:w-1/2 flex-1">
+                            <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                                <h2 class="text-lg font-bold text-slate-200 mb-4">Catálogo de produtos</h2>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead class="text-slate-500">
+                                            <tr class="border-b border-slate-800/50">
+                                                <th class="pb-3 font-medium text-left">SKU</th>
+                                                <th class="pb-3 font-medium text-left">Nome</th>
+                                                <th class="pb-3 font-medium text-left">Categoria</th>
+                                                <th class="pb-3 font-medium text-right">Preço</th>
+                                                <th class="pb-3 font-medium text-right">Estoque</th>
+                                                <th class="pb-3 font-medium text-right">Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-produtos" class="divide-y divide-slate-800/50">
+                                            <!-- Linhas inseridas via JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p id="vazio-produtos" class="mt-4 text-xs text-slate-500 text-center">Nenhum produto cadastrado ainda.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ABA: PEDIDOS / ORÇAMENTOS -->
+                <section id="tab-pedidos" class="tab-content hidden">
+                    <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                        <h2 class="text-lg font-bold text-slate-200 mb-5">Novo orçamento / pedido</h2>
+                        <form id="form-pedidos" class="space-y-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Cliente</label>
+                                    <select name="cliente"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        <option value="">Selecione um cliente</option>
+                                        <option value="1">Acme Protótipos</option>
+                                        <option value="2">Tech Brinquedos</option>
+                                        <option value="3">Maria Silva</option>
+                                        <option value="4">Indústria XYZ</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Tipo</label>
+                                    <select name="tipo"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        <option value="orcamento">Orçamento</option>
+                                        <option value="pedido">Pedido direto</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Descrição / Observações</label>
+                                    <textarea name="descricao" rows="2" placeholder="Detalhes da peça, cor, acabamento..."
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-slate-800/50 pt-4">
+                                <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                                    <svg class="h-4 w-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    Itens
+                                </h3>
+                                <div id="itens-pedido" class="space-y-3">
+                                    <!-- Itens inseridos via JS -->
+                                </div>
+                                <button type="button" id="add-item-pedido"
+                                    class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-2 text-sm text-slate-400 hover:text-violet-400 hover:border-violet-500 transition-all duration-300 group">
+                                    <svg class="h-4 w-4 group-hover:rotate-90 transition" fill="none" stroke="currentColor"
+                                        stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    Adicionar item
+                                </button>
+                            </div>
+
+                            <div class="flex justify-end pt-4">
+                                <button type="submit"
+                                    class="flex items-center justify-center gap-2.5 rounded-xl bg-gradient-violet px-8 py-3 text-sm font-bold text-white shadow-xl shadow-violet-600/30 transition-all duration-300 hover:shadow-violet-600/50 hover:-translate-y-1 active:scale-95">
+                                    Gerar orçamento
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- ABA: PRODUÇÃO -->
+                <section id="tab-producao" class="tab-content hidden">
+                    <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                        <h2 class="text-lg font-bold text-slate-200 mb-5">Nova ordem de produção</h2>
+                        <form id="form-producao" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Pedido</label>
+                                <select name="pedido"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    <option value="">Selecione o pedido</option>
+                                    <option value="PED-0001">PED-0001 - Suporte fone</option>
+                                    <option value="PED-0002">PED-0002 - Case celular</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Impressora</label>
+                                <select name="impressora"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    <option value="">Selecione a impressora</option>
+                                    <option value="1">Prusa i3 MK3</option>
+                                    <option value="2">Ender 3 V2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Filamento</label>
+                                <select name="filamento"
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    <option value="">Selecione o material</option>
+                                    <option value="1">PLA Preto 1kg</option>
+                                    <option value="2">PETG Branco 1kg</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Observações da produção</label>
+                                <textarea name="obs" rows="2" placeholder="Atenção ao suporte, peça delicada..."
+                                    class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300"></textarea>
+                            </div>
+                            <div class="md:col-span-2 flex justify-end">
+                                <button type="submit"
+                                    class="flex items-center justify-center gap-2.5 rounded-xl bg-amber-600 px-8 py-3 text-sm font-bold text-white shadow-xl shadow-amber-600/20 transition-all duration-300 hover:bg-amber-500 hover:-translate-y-1 active:scale-95">
+                                    Iniciar produção
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- ABA: FINANCEIRO -->
+                <section id="tab-financeiro" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                            <h2 class="text-lg font-bold text-slate-200 mb-5 flex items-center gap-2">
+                                <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Nova receita
+                            </h2>
+                            <form id="form-receita" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Descrição</label>
+                                    <input type="text" name="descricao" placeholder="Venda impressão suporte"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Valor (R$)</label>
+                                    <input type="number" name="valor" step="0.01" placeholder="0,00"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Data competência</label>
+                                    <input type="date" name="data"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                </div>
+                                <button type="submit"
+                                    class="w-full flex items-center justify-center gap-2.5 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-emerald-600/20 transition-all duration-300 hover:bg-emerald-500 hover:-translate-y-1 active:scale-95">
+                                    Registrar receita
+                                </button>
+                            </form>
+                        </div>
+                        <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                            <h2 class="text-lg font-bold text-slate-200 mb-5 flex items-center gap-2">
+                                <svg class="h-5 w-5 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                                Nova despesa
+                            </h2>
+                            <form id="form-despesa" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Descrição</label>
+                                    <input type="text" name="descricao" placeholder="Compra de filamento PLA"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Valor (R$)</label>
+                                    <input type="number" name="valor" step="0.01" placeholder="0,00"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Categoria</label>
+                                    <select name="categoria"
+                                        class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        <option value="variavel">Variável</option>
+                                        <option value="fixo">Fixa</option>
+                                    </select>
+                                </div>
+                                <button type="submit"
+                                    class="w-full flex items-center justify-center gap-2.5 rounded-xl bg-rose-600 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-rose-600/20 transition-all duration-300 hover:bg-rose-500 hover:-translate-y-1 active:scale-95">
+                                    Registrar despesa
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ABA: TAREFAS -->
+                <section id="tab-tarefas" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="lg:w-1/2">
+                            <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                                <h2 class="text-lg font-bold text-slate-200 mb-5">Nova tarefa</h2>
+                                <form id="form-tarefas" class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Título</label>
+                                        <input type="text" name="titulo" placeholder="Limpar bico da impressora"
+                                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Descrição</label>
+                                        <textarea name="descricao" rows="2" placeholder="Manutenção preventiva..."
+                                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300"></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Prioridade</label>
+                                            <select name="prioridade"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                                <option value="baixa">Baixa</option>
+                                                <option value="media">Média</option>
+                                                <option value="alta">Alta</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Vencimento</label>
+                                            <input type="date" name="vencimento"
+                                                class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2.5 px-4 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full flex items-center justify-center gap-2.5 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-violet-600/20 transition-all duration-300 hover:bg-violet-500 hover:-translate-y-1 active:scale-95">
+                                        Criar tarefa
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="lg:w-1/2 flex-1">
+                            <div class="rounded-3xl border border-slate-800/50 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 backdrop-blur animate-fade-in">
+                                <h2 class="text-lg font-bold text-slate-200 mb-4">Tarefas pendentes</h2>
+                                <div class="space-y-3 max-h-80 overflow-y-auto pr-2" id="lista-tarefas">
+                                <!-- Inseridas via JS -->
+                                </div>
+                                <p id="vazio-tarefas" class="mt-4 text-xs text-slate-500 text-center">Nenhuma tarefa cadastrada ainda.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Notificação toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden animate-slide-down">
+        <div class="flex items-start gap-3 rounded-2xl border border-slate-700 bg-slate-900 p-4 shadow-2xl shadow-black/50 backdrop-blur">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500 text-white shrink-0 shadow-lg shadow-violet-500/30">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <div>
+                <h4 id="toast-titulo" class="text-sm font-bold text-slate-200">Sucesso</h4>
+                <p id="toast-mensagem" class="text-xs text-slate-400 mt-0.5">Operação realizada com sucesso.</p>
+            </div>
+            <button id="fechar-toast" class="ml-2 p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-300">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar mobile
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const fecharSidebar = document.getElementById('fecharSidebar');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        if (fecharSidebar) fecharSidebar.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Abas com indicador deslizante
+        const botoesTab = document.querySelectorAll('.tab-btn');
+        const conteudosTab = document.querySelectorAll('.tab-content');
+        const indicator = document.getElementById('tabIndicator');
+
+        function atualizarIndicador(botaoAtivo) {
+            if (!indicator || !botaoAtivo) return;
+            const rect = botaoAtivo.getBoundingClientRect();
+            const container = botaoAtivo.parentElement.getBoundingClientRect();
+            indicator.style.left = `${rect.left - container.left}px`;
+            indicator.style.width = `${rect.width}px`;
+        }
+
+        botoesTab.forEach((botao, index) => {
+            botao.addEventListener('click', () => {
+                const tab = botao.getAttribute('data-tab');
+
+                botoesTab.forEach(b => {
+                    b.classList.remove('text-violet-400', 'bg-violet-600/20', 'border-violet-500/20');
+                    b.classList.add('text-slate-400');
+                });
+                botao.classList.remove('text-slate-400');
+                botao.classList.add('text-violet-400', 'bg-violet-600/20', 'border-violet-500/20');
+
+                conteudosTab.forEach(c => c.classList.add('hidden'));
+                const ativo = document.getElementById('tab-' + tab);
+                if (ativo) {
+                    ativo.classList.remove('hidden');
+                    ativo.classList.add('animate-fade-in');
+                }
+
+                atualizarIndicador(botao);
+            });
+        });
+
+        // Inicializa indicador na primeira aba
+        if (botoesTab.length > 0) {
+            atualizarIndicador(botoesTab[0]);
+            botoesTab[0].classList.remove('text-slate-400');
+            botoesTab[0].classList.add('text-violet-400', 'bg-violet-600/20', 'border-violet-500/20');
+        }
+
+        // Ajusta indicador no resize
+        window.addEventListener('resize', () => {
+            const ativo = document.querySelector('.tab-btn.text-violet-400');
+            if (ativo) atualizarIndicador(ativo);
+        });
+
+        // Toast
+        const toast = document.getElementById('toast');
+        const toastTitulo = document.getElementById('toast-titulo');
+        const toastMensagem = document.getElementById('toast-mensagem');
+        const fecharToast = document.getElementById('fechar-toast');
+
+        function mostrarToast(titulo, mensagem) {
+            toastTitulo.textContent = titulo;
+            toastMensagem.textContent = mensagem;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+
+        fecharToast.addEventListener('click', () => {
+            toast.classList.add('hidden');
+        });
+
+        // Helpers
+        function fmtMoeda(valor) {
+            return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // ========== CLIENTES ==========
+        const formClientes = document.getElementById('form-clientes');
+        const tbodyClientes = document.getElementById('tbody-clientes');
+
+        if (formClientes) {
+            formClientes.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formClientes);
+                const dados = Object.fromEntries(formData);
+
+                const tr = document.createElement('tr');
+                tr.className = 'group hover:bg-slate-800/30 transition-all duration-300 animate-fade-in';
+                tr.innerHTML = `
+                    <td class="pb-4 text-slate-200 font-medium">${dados.nome}</td>
+                    <td class="pb-4 text-slate-300">${dados.email}</td>
+                    <td class="pb-4 text-slate-300">${dados.cidade}</td>
+                    <td class="pb-4 text-slate-400 text-xs capitalize">${dados.origem.replace('_', ' ')}</td>
+                    <td class="pb-4">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium ${
+                            dados.status === 'cliente' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 shadow-lg shadow-emerald-500/5' :
+                            dados.status === 'lead' ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20 shadow-lg shadow-blue-500/5' :
+                            'bg-slate-500/10 text-slate-400 border border-slate-700/20'
+                        }">${dados.status.charAt(0).toUpperCase() + dados.status.slice(1)}</span>
+                    </td>
+                    <td class="pb-4 text-right">
+                        <button class="text-slate-500 hover:text-rose-400 transition-all duration-300" title="Excluir">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                tbodyClientes.prepend(tr);
+
+                const vazio = document.getElementById('vazio-clientes');
+                if (vazio) vazio.style.display = 'none';
+
+                formClientes.reset();
+                mostrarToast('Cliente cadastrado', `${dados.nome} foi adicionado com sucesso.`);
+            });
+        }
+
+        // ========== PRODUTOS ==========
+        const formProdutos = document.getElementById('form-produtos');
+        const tbodyProdutos = document.getElementById('tbody-produtos');
+
+        if (formProdutos) {
+            formProdutos.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formProdutos);
+                const dados = Object.fromEntries(formData);
+
+                const tr = document.createElement('tr');
+                tr.className = 'group hover:bg-slate-800/30 transition-all duration-300 animate-fade-in';
+                tr.innerHTML = `
+                    <td class="pb-4 font-mono text-slate-300">${dados.sku}</td>
+                    <td class="pb-4 text-slate-200 font-medium">${dados.nome}</td>
+                    <td class="pb-4 text-slate-400 text-xs capitalize">${dados.categoria.replace('_', ' ')}</td>
+                    <td class="pb-4 font-mono text-right text-slate-200">${fmtMoeda(dados.preco)}</td>
+                    <td class="pb-4 font-mono text-right text-slate-300">${dados.estoque}</td>
+                    <td class="pb-4 text-right">
+                        <button class="text-slate-500 hover:text-rose-400 transition-all duration-300" title="Excluir">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                tbodyProdutos.prepend(tr);
+
+                const vazio = document.getElementById('vazio-produtos');
+                if (vazio) vazio.style.display = 'none';
+
+                formProdutos.reset();
+                mostrarToast('Produto cadastrado', `${dados.nome} foi adicionado ao catálogo.`);
+            });
+        }
+
+        // ========== PEDIDOS / ITENS ==========
+        const btnAddItem = document.getElementById('add-item-pedido');
+        const containerItens = document.getElementById('itens-pedido');
+
+        if (btnAddItem) {
+            let contadorItens = 0;
+
+            btnAddItem.addEventListener('click', () => {
+                contadorItens++;
+                const div = document.createElement('div');
+                div.className = 'grid grid-cols-1 md:grid-cols-4 gap-3 items-end animate-fade-in';
+                div.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Produto</label>
+                        <input type="text" name="item_nome_${contadorItens}" placeholder="Ex: Suporte fone"
+                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2 px-3 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Qtd</label>
+                        <input type="number" name="item_qtd_${contadorItens}" value="1" min="1"
+                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2 px-3 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Preço unit.</label>
+                        <input type="number" name="item_preco_${contadorItens}" step="0.01" placeholder="0,00"
+                            class="w-full rounded-xl border border-slate-700 bg-slate-950/60 py-2 px-3 text-sm text-slate-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition-all duration-300">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-all duration-300" onclick="this.closest('.grid').remove()">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                containerItens.appendChild(div);
+            });
+        }
+
+        const formPedidos = document.getElementById('form-pedidos');
+        if (formPedidos) {
+            formPedidos.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formPedidos);
+                const cliente = formData.get('cliente');
+                const tipo = formData.get('tipo');
+
+                if (!cliente) {
+                    mostrarToast('Erro', 'Selecione um cliente antes de gerar.');
+                    return;
+                }
+
+                mostrarToast('Orçamento gerado', `Novo ${tipo === 'orcamento' ? 'orçamento' : 'pedido'} criado.`);
+                formPedidos.reset();
+                containerItens.innerHTML = '';
+            });
+        }
+
+        // ========== TAREFAS ==========
+        const formTarefas = document.getElementById('form-tarefas');
+        const listaTarefas = document.getElementById('lista-tarefas');
+
+        if (formTarefas) {
+            formTarefas.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formTarefas);
+                const dados = Object.fromEntries(formData);
+
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3 p-3 rounded-xl border border-slate-800/50 bg-slate-800/30 hover:bg-slate-800/50 transition-all duration-300 animate-fade-in';
+                div.innerHTML = `
+                    <input type="checkbox" class="rounded text-violet-600 focus:ring-violet-500 h-4 w-4 shrink-0">
+                    <div class="flex-1">
+                        <p class="text-sm text-slate-300 font-medium">${dados.titulo}</p>
+                        <p class="text-xs text-slate-500">${dados.descricao}</p>
+                    </div>
+                    <span class="text-[10px] font-bold ${
+                        dados.prioridade === 'alta' ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20' :
+                        dados.prioridade === 'media' ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20' :
+                        'text-blue-400 bg-blue-500/10 border border-blue-500/20'
+                    } px-1.5 py-0.5 rounded">${dados.prioridade.charAt(0).toUpperCase() + dados.prioridade.slice(1)}</span>
+                    <button class="text-slate-500 hover:text-rose-400 transition-all duration-300" title="Excluir">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                listaTarefas.prepend(div);
+
+                const vazio = document.getElementById('vazio-tarefas');
+                if (vazio) vazio.style.display = 'none';
+
+                formTarefas.reset();
+                mostrarToast('Tarefa criada', `${dados.titulo} foi adicionada à sua lista.`);
+            });
+        }
+
+        // ========== EMPRESA / RECEITA / DESPESA / PRODUÇÃO ==========
+        const formEmpresa = document.getElementById('form-empresa');
+        if (formEmpresa) {
+            formEmpresa.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formEmpresa);
+                const nome = formData.get('nome_fantasia');
+                mostrarToast('Empresa atualizada', `Dados de ${nome} salvos com sucesso.`);
+                formEmpresa.reset();
+            });
+        }
+
+        const formReceita = document.getElementById('form-receita');
+        if (formReceita) {
+            formReceita.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formReceita);
+                mostrarToast('Receita registrada', `Entrada de ${fmtMoeda(formData.get('valor'))} lançada.`);
+                formReceita.reset();
+            });
+        }
+
+        const formDespesa = document.getElementById('form-despesa');
+        if (formDespesa) {
+            formDespesa.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formDespesa);
+                mostrarToast('Despesa registrada', `Saída de ${fmtMoeda(formData.get('valor'))} lançada.`);
+                formDespesa.reset();
+            });
+        }
+
+        const formProducao = document.getElementById('form-producao');
+        if (formProducao) {
+            formProducao.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formProducao);
+                mostrarToast('Produção iniciada', 'Ordem de produção criada com sucesso.');
+                formProducao.reset();
+            });
+        }
+    </script>
+
+</body>
+
+</html>
