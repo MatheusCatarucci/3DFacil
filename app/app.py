@@ -24,7 +24,7 @@ from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 # Módulos próprios da aplicação
-from model import buscar_usuario_por_email
+from model import buscarUsuarioPorEmail
 
 
 # ============================================================
@@ -118,7 +118,7 @@ async def login(request: Request, usuario_form: Usuario):
     senha = usuario_form.senha
     
 
-    usuario_banco = buscar_usuario_por_email(email)
+    usuario_banco = buscarUsuarioPorEmail(email)
 
     if usuario_banco is None:
         return Response(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -151,10 +151,8 @@ async def dashboard(request: Request):
             status_code=status.HTTP_302_FOUND
         )
     
-    contexto = {
-        "nome": "Matheus",
-        "idade": 18
-    }
+
+
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
@@ -194,7 +192,7 @@ async def verificarSessao(request: Request):
 #ROTAS DE DEBUG
 @app.get("/usuario_banco")
 async def buscarUsuario(email: str = Query(...)):
-    usuario = buscar_usuario_por_email(email)
+    usuario = buscarUsuarioPorEmail(email)
     
     return {
         "id":usuario["id"],
