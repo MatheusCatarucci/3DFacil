@@ -143,6 +143,8 @@ async def login(request: Request, usuario_form: Usuario):
     
 @app.get("/dashboard")
 async def dashboard(request: Request):
+    verificarSessao(request)
+    
     if not verificarSessao(request):
         return RedirectResponse(
             url="/login",
@@ -160,6 +162,8 @@ async def dashboard(request: Request):
 
 @app.get("/gerenciar")
 async def gerenciar(request: Request):
+    verificarSessao(request)
+
     if not verificarSessao(request):
         return RedirectResponse(
             url="/login",
@@ -179,9 +183,10 @@ async def gerenciar(request: Request):
 
 @app.get("/session")
 async def verificarSessao(request: Request):
-    """Verifica se o usuário está autenticado na sessão.
-    Retorna True se autenticado, False caso contrário."""
-    return request.session.get("usuario_nome") is not None
+    if request.session.get("usuario_nome") is None:
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+    
+    return Response(status_code=status.HTTP_200_OK)
     
     
 #ROTAS DE DEBUG
